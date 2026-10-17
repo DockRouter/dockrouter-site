@@ -17,9 +17,6 @@
 body {
   background-image: none;
 }
-.container {
-  max-width: 94rem;
-}
 .logo {
   gap: 0.65rem;
   color: var(--ink);
@@ -955,12 +952,6 @@ p > a:not(.button) {
   }
 }
 @media (min-width: 1920px) {
-  html {
-    font-size: clamp(16px, 0.75vw, 28px);
-  }
-  .container {
-    max-width: 96rem;
-  }
   .dock-hero h1 {
     font-size: 5.15rem;
   }
@@ -1011,9 +1002,6 @@ p > a:not(.button) {
   }
 }
 @media (max-width: 800px) {
-  .container {
-    width: calc(100% - 3rem);
-  }
   .dock-hero {
     grid-template-columns: 1fr;
     padding-top: 3rem;
@@ -1147,9 +1135,6 @@ p > a:not(.button) {
   }
 }
 @media (max-width: 500px) {
-  .container {
-    width: calc(100% - 2.25rem);
-  }
   .header-inner {
     height: 4.5rem;
   }
@@ -1184,7 +1169,6 @@ p > a:not(.button) {
     gap: 0.6rem;
   }
   .dock-hero .button {
-    padding-inline: 1rem;
     font-size: 0.74rem;
     min-height: 3rem;
   }

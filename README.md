@@ -22,7 +22,7 @@ npm test
 node scripts/preview.mjs 3018
 ```
 
-The tests use the actual static export, an isolated preview server on port 47861 and Chromium. They cover installation tabs and keyboard control, clipboard success and refusal, documentation search, route simulation, six release downloads, persistent appearance and blocked storage, automated WCAG AA, reduced motion, the animated OXOGNET signature, internal links, and 320/360/390/768/1440/3840px layouts. Screenshots are saved under ignored `.qa/`.
+The tests use the actual static export, an isolated preview server on port 47863 and Chromium. They cover installation tabs and keyboard control, clipboard success and refusal, documentation search, route simulation, six release downloads, persistent appearance and blocked storage, automated WCAG AA, reduced motion, the animated OXOGNET signature, internal links, and 320/360/390/768/1440/3840px layouts. Screenshots are saved under ignored `.qa/`.
 
 ## Publish
 
@@ -41,3 +41,9 @@ MIT licensed. Third-party marks retain their ownership.
 ## Hero routing scene
 
 The hero uses the owner-supplied anchor upright at the center of an interactive SVG routing scene. Four synchronized stages show receive, TLS termination, route matching and forwarding. Destination buttons select the web/API/realtime example; pause and replay controls are keyboard accessible. Animation timers stop outside the viewport or in a hidden document. Reduced-motion mode shows a completed route while preserving destination selection. All displayed traffic is illustrative.
+
+## Shared layout system
+
+`src/app/layout-system.css` owns the site container and spacing tokens. The shell uses fluid gutters and a 1728px maximum while retaining the browser's default root font size. Header, content and footer share the same alignment. Prose is capped at 65ch; code, tables and visual panels can use the remaining width. Wide hero steps become a side rail, documentation and brand cards use three columns, and release cards use two columns.
+
+`tests/layout.spec.ts` checks 375, 768, 1024, 1440, 1920 and 2560px across six page types. It verifies container alignment, width bounds, overflow, paragraph/table widths, card columns and mobile controls. Measurements and page/footer screenshots are stored under `.qa/layout/`. The test server uses a DockRouter-specific port, 47863, to avoid collisions with other local projects.

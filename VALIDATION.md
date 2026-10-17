@@ -23,3 +23,18 @@ A rendered diagram containment assertion reproduced an oversized nested SVG (738
 ## Hero redesign
 
 Replaced the small skewed hub logo with a larger upright anchor and coordinated request/TLS/route animation. Added service selection, pause/resume and replay. Playwright clock tests exercise the complete sequence and paused timer; a separate test checks reduced-motion behavior. All 20 local browser tests passed, along with lint, static build and typecheck. Screenshots were reviewed at mobile, desktop and 3840x2160. The scene is a labeled illustration, not a live ingress connection.
+
+## Fluid layout revision
+
+The original rendered container measured 1536px at a 1920px viewport; the new layout contract test failed against the old export before the change. The final export measured:
+
+| Viewport | Container | Side gutter | Root font |
+| --- | --- | --- | --- |
+| 375 | 335 | 20 | 16px |
+| 768 | 716.80 | 25.59 | 16px |
+| 1024 | 955.72 | 34.14 | 16px |
+| 1440 | 1344 | 48 | 16px |
+| 1920 | 1728 | 96 | 16px |
+| 2560 | 1728 | 416 | 16px |
+
+All six sizes passed container/header/footer alignment, viewport containment, prose/table separation, page overflow and runtime-error checks across home, docs index, configuration reference, downloads, brand and changelog pages. Screenshots were reviewed for all target sizes, including mobile CTA wrapping and wide footer/grid composition. The existing 320px and 3840px controls also pass. Final local lint, build, typecheck and 26/26 browser tests passed. Screenshots and exact measurements are retained in ignored `.qa/layout/`.

@@ -208,12 +208,27 @@ for (const width of [320, 360, 390, 768, 1440, 3840]) {
     for (const path of ["/", "/docs/architecture/", "/download/", "/brand/"]) {
       await page.goto(path);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      const overflow = await page.evaluate(() => ({
+        width: document.documentElement.scrollWidth,
+        viewport: innerWidth,
+        offenders:
+          document.documentElement.scrollWidth > innerWidth
+            ? Array.from(document.querySelectorAll("body *"))
+                .filter(
+                  (el) => el.getBoundingClientRect().right > innerWidth + 1,
+                )
+                .slice(0, 12)
+                .map((el) => ({
+                  tag: el.tagName,
+                  class: el.getAttribute("class"),
+                  right: el.getBoundingClientRect().right,
+                }))
+            : [],
+      }));
       expect(
-        await page.evaluate(
-          () => document.documentElement.scrollWidth <= window.innerWidth,
-        ),
-        path,
-      ).toBe(true);
+        overflow.width,
+        `${path} ${JSON.stringify(overflow.offenders)}`,
+      ).toBeLessThanOrEqual(overflow.viewport);
       if (path === "/") {
         await expect(page.locator(".routing-drawing")).toBeVisible();
         const drawingBounds = await page
