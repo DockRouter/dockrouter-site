@@ -1,23 +1,15 @@
 # Validation
 
-Verified on 2026-10-17 using Node.js 24.13.0 on Windows. The directory was initially empty; all tracked website files belong to this implementation.
+2026-10-18, Windows, Node.js, actual Next.js static export.
 
-## Local result
+- `npm ci`: successful, npm audit reported zero vulnerabilities.
+- `npm run lint`: passed, no warnings.
+- `npm run build`: passed; all application pages statically exported.
+- `npm run typecheck`: passed.
+- `npm test`: exercises installation selection, copy success/failure, search navigation, route simulation without remote calls, all six v1.2.0 download combinations, theme persistence and blocked storage, keyboard dismissal, automated WCAG AA, 360/390/768/1440/3840px layouts, reduced motion, OXOGNET drawing, internal routes and anchors, 404 and CNAME.
 
-- `npm run format` — 30 source/config/test files checked; no remaining diagnostics.
-- `npm run build` — Next.js 16.4.2 production export succeeded; 22 generated entries, including the 404, sitemap and robots assets.
-- `npm run typecheck` — passed.
-- `npm test` — 16 Chromium tests passed; zero skips or retries.
-- Manual browser review — homepage on desktop, 390px mobile, and dark appearance at 3840×2160. SVG shapes remain vectors, with explicit reduced-motion fallbacks.
+The first browser run found contrast failures on the TLS indicator and orange CTA. Both were corrected before publication. Browser screenshots were visually reviewed for the desktop, mobile and 4K layouts. Automated accessibility checks are not a full manual accessibility certification. Website tests do not run the Docker ingress engine or physical mobile devices.
 
-The suite exercises selected commands and clipboard success/failure, search results and empty results, inspector selection/replay, platform and CPU download mapping, persistent themes and blocked storage, keyboard dismissal, automated WCAG A/AA checks in both appearances, reduced motion, 360/390/768/1440/3840px overflow checks across four page types, every document route, internal links and the 404 response.
+Source facts: upstream README, go.mod and GitHub v1.2.0 release asset names. No invented traffic statistics, customers, benchmark numbers or testimonials are used.
 
-## Evidence boundary
-
-These checks exercise the exported website in a browser. They do not launch the WireRift client/server or certify behavior on physical mobile devices. The inspector is an explicitly labeled local demonstration; replay does not send a network request. Automated accessibility checks are supplemented by keyboard and visual review, but are not a full manual accessibility certification.
-
-Product content was checked against WireRift's current upstream README, Go module, Docker Compose file, brand reference and v1.7.0 release assets. Site preview and tunnel service domains are separate; example tunnel URLs are not advertised as a hosted service.
-
-## Deployment
-
-The GitHub Actions workflow runs lint, build, type check and the same 16 browser tests before deploying `out/`. The live workflow result and custom-domain HTTPS status are verified separately after publication.
+Final local result: 18/18 browser tests passed, including automated WCAG AA on the home page in both themes and on documentation, downloads, brand and release pages. No runtime errors or page overflow were observed from 320px through 3840px.

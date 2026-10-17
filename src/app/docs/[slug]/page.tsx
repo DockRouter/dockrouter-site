@@ -36,7 +36,7 @@ export default async function DocPage({
     <main id="main" className="docs-layout container">
       <aside className="docs-sidebar">
         <nav aria-label="Documentation">
-          {["Start here", "Tunnels", "Operate", "Reference"].map((category) => (
+          {["Start here", "Routing", "Operate", "Reference"].map((category) => (
             <div className="docs-nav-group" key={category}>
               <h2>{category}</h2>
               {docs
@@ -126,8 +126,8 @@ export default async function DocPage({
         <div className="doc-footer">
           <p>
             Based on the{" "}
-            <a href={`${REPO}/blob/master/README.md`}>
-              upstream WireRift reference <ArrowUpRight size={12} />
+            <a href={`${REPO}/blob/main/README.md`}>
+              upstream DockRouter reference <ArrowUpRight size={12} />
             </a>
             . Check the source for the latest options.
           </p>

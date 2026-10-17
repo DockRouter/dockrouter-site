@@ -54,7 +54,7 @@ export function Navigation() {
     return () => document.removeEventListener("keydown", key);
   }, []);
   const links = [
-    ["Why WireRift", "/#features"],
+    ["Why DockRouter", "/#features"],
     ["Documentation", "/docs/getting-started/"],
     ["Download", "/download/"],
     ["Changelog", "/changelog/"],
@@ -65,7 +65,7 @@ export function Navigation() {
         <div className="header-inner container">
           <Link
             href="/"
-            aria-label="WireRift home"
+            aria-label="DockRouter home"
             onClick={() => setMenu(false)}
           >
             <Logo />
@@ -96,7 +96,7 @@ export function Navigation() {
             <a
               href={REPO}
               className="header-github"
-              aria-label="WireRift on GitHub"
+              aria-label="DockRouter on GitHub"
             >
               <Github size={17} />
               <span>GitHub</span>
@@ -179,7 +179,7 @@ export function Navigation() {
             ))
           ) : (
             <p className="search-empty">
-              No results for “{query}”. Try “TLS”, “TCP”, or “server”.
+              No results for “{query}”. Try “TLS”, “labels”, or “metrics”.
             </p>
           )}
         </div>

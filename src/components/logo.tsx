@@ -1,70 +1,28 @@
-import { rayEnd, riftGeometry as shape } from "@/lib/brand-geometry";
 import { wordmark } from "@/lib/wordmark";
-
-export function RiftMark({ className = "" }: { className?: string }) {
+export function RouterMark({ className = "" }: { className?: string }) {
   return (
     <svg
-      className={`rift-mark ${className}`}
-      viewBox="0 0 128 128"
+      className={`router-mark ${className}`}
+      viewBox="0 0 64 64"
       fill="none"
       aria-hidden="true"
     >
-      <circle {...shape.disc} fill="#F5AD21" />
-      {shape.wires.map((d) => (
-        <path
-          key={d}
-          d={d}
-          fill="currentColor"
-          stroke="var(--logo-cut, #fffdf8)"
-          strokeWidth="3.2"
-          strokeLinejoin="round"
-          paintOrder="stroke"
-        />
-      ))}
-      <g
-        fill="var(--logo-cut, #fffdf8)"
-        stroke="var(--logo-cut, #fffdf8)"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-      >
-        {shape.rays.map((p) => (
-          <g key={`${p.ex}:${p.ey}`}>
-            <path d={`M${p.x} ${p.y} ${p.ex} ${p.ey}`} stroke="#F5AD21" />
-            <path d={`M${p.x} ${p.y} ${rayEnd(p).x} ${rayEnd(p).y}`} />
-            <circle
-              cx={p.ex}
-              cy={p.ey}
-              r={p.r}
-              stroke="none"
-              fill={rayEnd(p).outer ? "#F5AD21" : "var(--logo-cut, #fffdf8)"}
-            />
-          </g>
-        ))}
-        <path
-          d={shape.arrow}
-          strokeLinecap="butt"
-          stroke="#F5AD21"
-          fill="#F5AD21"
-        />
-        {shape.sparks.map((p) => (
-          <circle key={p.cx} {...p} stroke="none" />
-        ))}
-      </g>
+      <path d="M8 18h16l8 14-8 14H8l8-14z" fill="currentColor" />
+      <path d="M56 18H40l-8 14 8 14h16l-8-14z" fill="var(--amber, #f05b35)" />
       <path
-        d={shape.bolt}
-        fill="currentColor"
-        stroke="var(--logo-cut, #fffdf8)"
-        strokeWidth="3.8"
-        strokeLinejoin="miter"
-        paintOrder="stroke"
+        d="M24 8h16M24 56h16"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="square"
       />
+      <circle cx="32" cy="32" r="4" fill="var(--paper, #faf9f6)" />
     </svg>
   );
 }
 export function Logo() {
   return (
     <span className="logo">
-      <RiftMark />
+      <RouterMark />
       <svg
         className="logo-type"
         viewBox={`0 0 ${wordmark.width} 64`}
@@ -79,7 +37,7 @@ export function Logo() {
           />
         ))}
       </svg>
-      <span className="sr-only">WireRift</span>
+      <span className="sr-only">DockRouter</span>
     </span>
   );
 }

@@ -1,6 +1,6 @@
-export const REPO = "https://github.com/WireRift/WireRift";
-export const SITE_REPO = "https://github.com/wirerift/wirefift-site";
-export const VERSION = "1.7.0";
-export const SITE = "https://wirerift.com";
+export const REPO = "https://github.com/DockRouter/dockrouter";
+export const SITE_REPO = "https://github.com/DockRouter/dockrouter-site";
+export const VERSION = "1.2.0";
+export const SITE = "https://dockrouter.com";
 export const description =
-  "Your localhost, connected to the world. Open-source HTTP and TCP tunnels in a single Go binary. Self-hosted, zero dependencies, entirely yours.";
+  "Your containers. Already connected. A Docker-native ingress router with automatic TLS, label-based discovery and a built-in dashboard. Pure Go. Zero dependencies.";

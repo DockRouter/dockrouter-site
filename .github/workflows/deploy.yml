@@ -1,4 +1,4 @@
-name: Deploy WireRift website
+name: Deploy DockRouter website
 on:
   push:
     branches: [main]

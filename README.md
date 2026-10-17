@@ -1,17 +1,17 @@
-# WireRift website
+# DockRouter website
 
-The Next.js website for [wirerift.com](https://wirerift.com). Static export, native SVG identity, responsive layouts from mobile to 4K, accessible appearance picker, searchable documentation and an interactive tunnel/inspector demonstration.
+The Next.js website for [dockrouter.com](https://dockrouter.com), published from [DockRouter/dockrouter-site](https://github.com/DockRouter/dockrouter-site) to GitHub Pages.
 
 ## Develop
 
-Requires Node.js 24 and npm.
+Use Node.js 24 and npm:
 
 ```sh
 npm ci
-npm run dev -- --port 3015
+npm run dev -- --port 3018
 ```
 
-## Verify
+## Check and preview
 
 ```sh
 npm run lint
@@ -19,26 +19,21 @@ npm run build
 npm run typecheck
 npx playwright install chromium
 npm test
+node scripts/preview.mjs 3018
 ```
 
-The test runner starts the actual `out/` export on a dedicated port (47861) and refuses to reuse another running server. It checks command selection and clipboard success/failure, documentation search, example request replay, platform/architecture downloads, appearance persistence and storage failure, keyboard controls, WCAG AA automated checks, reduced motion, internal links, and layouts at 360, 390, 768, 1440 and 3840 pixels. These checks do not run an actual WireRift tunnel or certify a physical mobile device.
-
-```sh
-node scripts/preview.mjs 3015
-```
+The tests use the actual static export, an isolated preview server on port 47861 and Chromium. They cover installation tabs and keyboard control, clipboard success and refusal, documentation search, route simulation, six release downloads, persistent appearance and blocked storage, automated WCAG AA, reduced motion, the animated OXOGNET signature, internal links, and 320/360/390/768/1440/3840px layouts. Screenshots are saved under ignored `.qa/`.
 
 ## Publish
 
-Pushes to `main` run `.github/workflows/deploy.yml`. Lint, export, types and browser tests must pass before GitHub Pages deploys `out/`. Enable Pages with GitHub Actions as its source and set the custom domain to `wirerift.com`. `public/CNAME` and the exported CNAME match this domain. DNS must point to GitHub Pages; TLS provisioning is managed by GitHub.
-
-The repository name `wirerift/wirefift-site` follows the name requested for this website. The tunnel engine remains in [WireRift/WireRift](https://github.com/WireRift/WireRift).
+Push to main. `.github/workflows/deploy.yml` runs lint, static export, typecheck and browser tests before deploying `out/` to GitHub Pages. Configure Pages to use GitHub Actions and set its custom domain to `dockrouter.com`. The DNS A records already point at GitHub Pages; domain settings are managed at the repository level. `public/CNAME` and the export also retain the canonical domain. Future website updates belong in this repository, independently of the Go engine repository.
 
 ## Content and assets
 
-- Product behavior, commands and download assets were checked against the upstream README, Go module, Compose configuration and v1.7.0 release on 2026-10-17. Update `src/lib/site.ts` and verify the release matrix before changing the displayed version.
-- The terminal and inspector contain labeled illustrative examples. They do not connect to a tunnel server or send webhook requests.
-- The appearance picker and OXOGNET SVG signature are adapted from [CobaltDB's website](https://github.com/cobaltdb/cobaltdb-site) at the user's request. Its MIT notice is retained at `public/licenses/cobaltdb-site.txt`.
-- The WireRift symbol is an original SVG interpretation of the supplied brand reference. Logos, social preview and app icon are in `public/`. `npm run brand` regenerates the shared React wordmark, outlined SVG assets, compact favicon and raster previews using Fontkit and Sharp. Geometry lives in `src/lib/brand-geometry.ts`; both the website and downloads use it. Typeface outlines come from the bundled, OFL-licensed Geist font; exported logos do not require a font installation.
-- Geist, Geist Mono and Lucide notices are retained in `public/licenses/`.
+- Product information is based on the upstream [README](https://github.com/DockRouter/dockrouter), its Go module (Go 1.22), and v1.2.0 release assets, checked on 2026-10-18. Update `src/lib/site.ts` and verify the release matrix when changing versions.
+- Nine documentation topics cover installation, routing, TLS, balancing, security, observability, architecture and configuration. The route explorer is a labeled local simulation. It does not contact a Docker host or run an ingress router.
+- Original DockRouter SVG mark, outlined wordmark, favicon, stacked variants and social image live in `public/`. `npm run brand` regenerates them with Fontkit and Sharp. The outlined wordmark uses OFL-licensed Geist and needs no installed font when downloaded.
+- The website foundation was adapted from the MIT-licensed WireRift website. The appearance picker and animated OXOGNET area were adapted from the MIT-licensed CobaltDB website as requested. Copyright notices are retained in `public/licenses/`.
+- Geist and Geist Mono are bundled locally. Lucide provides interface icons. Third-party license notices are included in `public/licenses/`.
 
-The website is MIT licensed. Third-party marks retain their respective ownership.
+MIT licensed. Third-party marks retain their ownership.

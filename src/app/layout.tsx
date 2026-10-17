@@ -6,32 +6,33 @@ import "@fontsource-variable/geist";
 import "@fontsource-variable/geist-mono";
 import "./globals.css";
 import "./appearance.css";
+import "./dockrouter.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
   title: {
-    default: "WireRift — Localhost. Meet the world.",
-    template: "%s · WireRift",
+    default: "DockRouter — Your containers. Already connected.",
+    template: "%s · DockRouter",
   },
   description,
   openGraph: {
-    title: "WireRift — Localhost. Meet the world.",
+    title: "DockRouter — Your containers. Already connected.",
     description,
     url: SITE,
-    siteName: "WireRift",
+    siteName: "DockRouter",
     type: "website",
     images: [
       {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "WireRift — Your localhost, connected to the world",
+        alt: "DockRouter — Your containers. Already connected.",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "WireRift — Localhost. Meet the world.",
+    title: "DockRouter — Your containers. Already connected.",
     description,
     images: ["/og.png"],
   },
@@ -46,7 +47,7 @@ export const viewport: Viewport = {
   ],
 };
 const themeScript =
-  "try{var t=localStorage.getItem('wirerift-theme');document.documentElement.dataset.theme=t==='light'||t==='dark'?t:'system'}catch{}";
+  "try{var t=localStorage.getItem('dockrouter-theme');document.documentElement.dataset.theme=t==='light'||t==='dark'?t:'system'}catch{}";
 export default function RootLayout({
   children,
 }: {

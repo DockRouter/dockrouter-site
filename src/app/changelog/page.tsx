@@ -20,22 +20,21 @@ export default function Changelog() {
           Always moving.
         </h1>
         <p>
-          Follow WireRift’s releases, inspect what changed, and find the right
+          Follow DockRouter’s releases, inspect what changed, and find the right
           version for your infrastructure.
         </p>
       </header>
       <div className="release-layout">
         <article className="release-card">
           <span className="release-label">LATEST VERIFIED RELEASE</span>
-          <h2>WireRift v{VERSION}</h2>
+          <h2>DockRouter v{VERSION}</h2>
           <p>
             The latest release verified when this website was built. Find the
             authoritative release notes, binaries and checksums on GitHub.
           </p>
           <p>
-            Native client and server binaries are available for Linux, macOS,
-            Windows and FreeBSD, with architecture options for supported
-            platforms.
+            Native binary archives are available for Linux, macOS and Windows,
+            on amd64 and arm64 architectures.
           </p>
           <a
             href={`${REPO}/releases/tag/v${VERSION}`}
@@ -57,7 +56,7 @@ export default function Changelog() {
             All releases <ArrowUpRight size={15} />
           </a>
           <br />
-          <a href={`${REPO}/commits/master/`} className="text-link">
+          <a href={`${REPO}/commits/main/`} className="text-link">
             Source history <ArrowUpRight size={15} />
           </a>
         </article>

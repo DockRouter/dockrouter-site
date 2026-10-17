@@ -9,7 +9,7 @@ import {
   useSyncExternalStore,
 } from "react";
 
-export const THEME_KEY = "wirerift-theme";
+export const THEME_KEY = "dockrouter-theme";
 type Theme = "system" | "light" | "dark";
 const choices = [
   { value: "light", label: "Light", icon: Sun },
@@ -24,10 +24,10 @@ function subscribe(callback: () => void) {
       value === "light" || value === "dark" ? value : "system";
     callback();
   };
-  window.addEventListener("wirerift:theme-change", callback);
+  window.addEventListener("dockrouter:theme-change", callback);
   window.addEventListener("storage", storage);
   return () => {
-    window.removeEventListener("wirerift:theme-change", callback);
+    window.removeEventListener("dockrouter:theme-change", callback);
     window.removeEventListener("storage", storage);
   };
 }
@@ -79,7 +79,7 @@ export function ThemePicker() {
     } catch {
       /* The selection still works when storage is unavailable. */
     }
-    window.dispatchEvent(new Event("wirerift:theme-change"));
+    window.dispatchEvent(new Event("dockrouter:theme-change"));
   }
   return (
     <div className="theme-picker" ref={picker}>

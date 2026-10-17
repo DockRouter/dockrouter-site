@@ -9,13 +9,13 @@ export function Footer() {
     <footer className="site-footer">
       <div className="container footer-main">
         <div className="footer-brand">
-          <Link href="/" aria-label="WireRift home">
+          <Link href="/" aria-label="DockRouter home">
             <Logo />
           </Link>
           <p>
-            Local by nature.
+            Docker by nature.
             <br />
-            Connected by choice.
+            Connected by design.
           </p>
           <span className="built-go">
             <i />
@@ -23,7 +23,7 @@ export function Footer() {
           </span>
         </div>
         <div className="footer-column">
-          <h3>WireRift</h3>
+          <h3>DockRouter</h3>
           <Link href="/#features">Features</Link>
           <Link href="/#how-it-works">How it works</Link>
           <Link href="/download/">Downloads</Link>
@@ -32,8 +32,8 @@ export function Footer() {
         <div className="footer-column">
           <h3>For developers</h3>
           <Link href="/docs/getting-started/">Documentation</Link>
-          <Link href="/docs/server/">Self-hosting</Link>
-          <Link href="/docs/api/">API reference</Link>
+          <Link href="/docs/installation/">Installation</Link>
+          <Link href="/docs/observability/">API & metrics</Link>
           <Link href="/docs/security/">Security</Link>
         </div>
         <div className="footer-column">
@@ -43,7 +43,7 @@ export function Footer() {
           </a>
           <a href={`${REPO}/issues`}>Report an issue</a>
           <Link href="/brand/">Brand assets</Link>
-          <a href={`${REPO}/blob/master/LICENSE`}>MIT license</a>
+          <a href={`${REPO}/blob/main/LICENSE`}>MIT license</a>
         </div>
       </div>
       <section
@@ -60,7 +60,7 @@ export function Footer() {
           </a>
           <div className="studio-copy">
             <span className="eyebrow">THE PEOPLE BEHIND THE CONNECTION</span>
-            <p>WireRift is part of the</p>
+            <p>DockRouter is part of the</p>
             <h2 id="studio-heading">
               <a href="https://oxog.net/">
                 oxog<span>net</span>
@@ -100,13 +100,13 @@ export function Footer() {
         </div>
       </section>
       <div className="container footer-bottom">
-        <span>© {new Date().getUTCFullYear()} WireRift contributors</span>
+        <span>© {new Date().getUTCFullYear()} DockRouter contributors</span>
         <span className="footer-bottom-links">
-          <a href={`${REPO}/blob/master/LICENSE`}>MIT licensed</a>
+          <a href={`${REPO}/blob/main/LICENSE`}>MIT licensed</a>
           <a href={SITE_REPO}>
             Website source <ArrowUpRight size={12} />
           </a>
-          <a href={REPO} aria-label="WireRift on GitHub">
+          <a href={REPO} aria-label="DockRouter on GitHub">
             <Github size={17} />
           </a>
         </span>

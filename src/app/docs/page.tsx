@@ -10,11 +10,11 @@ export default function Docs() {
   return (
     <main id="main" className="container">
       <header className="subpage-header">
-        <span className="eyebrow">THE WIRE MANUAL</span>
-        <h1>Make the connection.</h1>
+        <span className="eyebrow">THE ROUTER MANUAL</span>
+        <h1>A clear way in.</h1>
         <p>
-          From your first binary to your own public edge. Everything you need to
-          get WireRift running your way.
+          From your first labels to your own public edge. Everything you need to
+          get DockRouter running your way.
         </p>
       </header>
       <div className="brand-grid">

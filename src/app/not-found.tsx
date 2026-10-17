@@ -6,14 +6,14 @@ export default function NotFound() {
       <span className="eyebrow" style={{ justifyContent: "center" }}>
         404 / CONNECTION NOT FOUND
       </span>
-      <h1>A little off the wire.</h1>
+      <h1>This route ends here.</h1>
       <p>
         This page isn’t at the other end. Let’s get you back to a working
         connection.
       </p>
       <Link href="/" className="button primary">
         <ArrowLeft size={16} />
-        Back to localhost
+        Back to DockRouter
       </Link>
       <Link href="/docs/getting-started/" className="button secondary">
         Find the docs

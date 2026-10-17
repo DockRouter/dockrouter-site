@@ -1,12 +1,13 @@
-import { ArrowRight, ArrowUpRight, Github } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Code } from "@/components/code";
 import { DownloadPicker } from "@/components/download-picker";
 import { REPO, VERSION } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Download",
   description:
-    "Download WireRift for macOS, Linux, Windows and FreeBSD. Single binaries, no runtime dependencies.",
+    "Download DockRouter for Linux, macOS and Windows, or deploy it with Docker.",
   alternates: { canonical: "/download/" },
 };
 export default function Download() {
@@ -14,54 +15,45 @@ export default function Download() {
     <main id="main" className="container">
       <header className="subpage-header">
         <span className="eyebrow">
-          <i />
-          SMALL DOWNLOAD. OPEN POSSIBILITIES.
+          <i /> SMALL DOWNLOAD. CLEAR DIRECTION.
         </span>
         <h1>
-          Your next connection
+          Your next deployment
           <br />
           starts here.
         </h1>
         <p>
-          Two binaries. Zero runtime dependencies. Pick the one for your machine
-          and get back to what you’re building.
+          Run the Docker image or pick a native binary. Same small router. Same
+          clear path to your containers.
         </p>
       </header>
       <div className="download-layout">
         <DownloadPicker />
         <aside className="download-aside">
-          <span className="release-label">LATEST RELEASE / v{VERSION}</span>
-          <h2>The client goes with you.</h2>
+          <span className="release-label">VERIFIED RELEASE / v{VERSION}</span>
+          <h2>Docker is a good place to start.</h2>
           <p>
-            Run <code>wirerift</code> alongside your local app. It connects
-            outbound to a server you control and brings public requests back to
-            your machine.
+            Keep the router alongside your services. Publish ports 80 and 443,
+            mount the Docker socket and persist /data.
           </p>
-          <h2>The server is your edge.</h2>
-          <p>
-            Run <code>wirerift-server</code> on a reachable machine. Configure
-            your domain, token and TLS, then open your first tunnel.
-          </p>
-          <Link href="/docs/server/" className="text-link">
-            Set up your server <ArrowRight size={15} />
+          <Code title="Docker image">
+            docker pull dockrouter/dockrouter:latest
+          </Code>
+          <Link className="text-link" href="/docs/getting-started/">
+            Use the complete Compose example <ArrowRight size={15} />
           </Link>
           <hr />
-          <h2>Prefer to build it yourself?</h2>
+          <h2>Prefer to build from source?</h2>
           <p>
-            All you need is Go 1.23 or later and the source. The tunnel engine
-            uses the standard library.
+            Use Go 1.22 or later and the upstream source. No third-party Go
+            packages are required.
           </p>
-          <Link href="/docs/installation/#source" className="text-link">
-            Build from source <ArrowRight size={15} />
+          <Link className="text-link" href="/docs/installation/#source">
+            Build the binary <ArrowRight size={15} />
           </Link>
-          <a href={`${REPO}/releases`} className="button secondary">
-            <Github size={16} />
+          <a className="button secondary" href={`${REPO}/releases`}>
             All releases <ArrowUpRight size={14} />
           </a>
-          <p className="download-note">
-            Release files are served directly by GitHub. The website does not
-            install or execute anything on your machine.
-          </p>
         </aside>
       </div>
     </main>
