@@ -84,6 +84,9 @@ test("installation commands follow the selected platform", async ({ page }) => {
   await expect(page.locator(".quickstart-code")).toContainText(
     ".\\wirerift.exe http 3000",
   );
+  await expect(
+    page.getByRole("region", { name: "your first HTTP tunnel code" }),
+  ).toContainText("myapp `");
 });
 
 test("download architecture cannot leak between platforms", async ({

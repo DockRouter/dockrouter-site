@@ -290,6 +290,7 @@ const installs = {
 };
 export function Quickstart() {
   const [os, setOS] = useState<keyof typeof installs>("macOS");
+  const continuation = os === "Windows" ? "`" : "\\";
   return (
     <div className="quickstart-layout">
       <div className="quickstart-steps">
@@ -359,7 +360,7 @@ export function Quickstart() {
           <Terminal size={15} />
           <span>Then, connect to your server:</span>
         </div>
-        <Code title="your first HTTP tunnel">{`${os === "Windows" ? ".\\wirerift.exe" : "wirerift"} http 3000 myapp \\\n  --server tunnel.example.com:4443 \\\n  --token YOUR_TOKEN`}</Code>
+        <Code title="your first HTTP tunnel">{`${os === "Windows" ? ".\\wirerift.exe" : "wirerift"} http 3000 myapp ${continuation}\n  --server tunnel.example.com:4443 ${continuation}\n  --token YOUR_TOKEN`}</Code>
         <p className="code-note">
           Need another architecture?{" "}
           <Link href="/download/">
