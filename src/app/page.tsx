@@ -86,9 +86,9 @@ export default function Home() {
           </a>
           <div className="hero-kicker">THE DOCKER-NATIVE INGRESS ROUTER</div>
           <h1>
-            Your containers.
+            Stop configuring.
             <br />
-            <span>Already connected.</span>
+            <span>Start shipping.</span>
           </h1>
           <p className="dock-lead">
             You build the application.

@@ -11,12 +11,12 @@ import "./dockrouter.css";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
   title: {
-    default: "DockRouter — Your containers. Already connected.",
+    default: "DockRouter — Stop Configuring. Start Shipping.",
     template: "%s · DockRouter",
   },
   description,
   openGraph: {
-    title: "DockRouter — Your containers. Already connected.",
+    title: "DockRouter — Stop Configuring. Start Shipping.",
     description,
     url: SITE,
     siteName: "DockRouter",
@@ -26,13 +26,13 @@ export const metadata: Metadata = {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "DockRouter — Your containers. Already connected.",
+        alt: "DockRouter — Stop Configuring. Start Shipping.",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DockRouter — Your containers. Already connected.",
+    title: "DockRouter — Stop Configuring. Start Shipping.",
     description,
     images: ["/og.png"],
   },
@@ -42,8 +42,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fffdf8" },
-    { media: "(prefers-color-scheme: dark)", color: "#111310" },
+    { media: "(prefers-color-scheme: light)", color: "#f7f9fd" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c1523" },
   ],
 };
 const themeScript =

@@ -14,8 +14,9 @@ export default function Brand() {
         </span>
         <h1>Designed to connect.</h1>
         <p>
-          Two directions. One connection. An original vector identity for
-          DockRouter, sharp from the smallest browser tab to a 4K screen.
+          The DockRouter anchor, routing branches and orange connection nodes.
+          Faithfully redrawn in SVG from the supplied brand reference, with
+          outlined lettering that stays sharp on a 4K screen.
         </p>
       </header>
       <div className="brand-grid">
@@ -31,7 +32,7 @@ export default function Brand() {
               ) : i === 1 ? (
                 <RouterMark />
               ) : (
-                <picture>
+                <picture style={{ background: "#fff" }}>
                   <img
                     src={href}
                     width="400"
@@ -51,16 +52,16 @@ export default function Brand() {
         ))}
       </div>
       <section className="doc-section">
-        <h2>A little warmth. A clear signal.</h2>
+        <h2>Anchored in blue. Connected in orange.</h2>
         <p>
-          Signal orange marks the connection. Graphite gives the identity its
-          structure. Warm paper leaves room to breathe.
+          Blue anchors the mark. Navy defines the routes and Dock lettering.
+          Orange highlights each connection and the Router wordmark.
         </p>
         <div className="brand-colors">
           {[
-            ["Signal orange", "#F05B35", "#251c16"],
-            ["Graphite", "#252721", "#fff"],
-            ["Warm paper", "#FAF9F6", "#252721"],
+            ["Anchor blue", "#0879F5", "#03101c"],
+            ["Route navy", "#153454", "#fff"],
+            ["Connection orange", "#FF7510", "#251c16"],
           ].map(([name, color, ink]) => (
             <div
               key={name}

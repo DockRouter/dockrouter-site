@@ -1,16 +1,18 @@
 :root {
-  --paper: light-dark(oklch(0.98 0.005 80), oklch(0.17 0.006 60));
-  --surface: light-dark(#fff, #202120);
-  --surface-soft: light-dark(#f0efeb, #1c1d1c);
-  --surface-hover: light-dark(#e9e7e1, #292b28);
-  --ink: light-dark(#252721, #efeee8);
-  --muted: light-dark(#696b63, #acafa4);
-  --line: light-dark(#dfdfd7, #363932);
-  --amber: oklch(0.66 0.19 36);
-  --accent-ink: light-dark(#b63718, #ff9b77);
+  --paper: light-dark(#f7f9fd, #0c1523);
+  --surface: light-dark(#fff, #142137);
+  --surface-soft: light-dark(#eef3fa, #101c2e);
+  --surface-hover: light-dark(#e5edf8, #1a2c46);
+  --ink: light-dark(#153454, #e9f1fc);
+  --muted: light-dark(#596b82, #a6b8d0);
+  --line: light-dark(#dce4ef, #2c3d56);
+  --amber: #ff7510;
+  --accent-ink: light-dark(#0868db, #79b6ff);
+  --brand-navy: light-dark(#153454, #c4d7f0);
+  --brand-orange: #ff7510;
   --green: light-dark(#427249, #96bd88);
-  --diagram-line: light-dark(#c1c4b7, #555b4c);
-  --diagram-side: light-dark(#e9eade, #2b3027);
+  --diagram-line: light-dark(#b8c9df, #3a5273);
+  --diagram-side: light-dark(#e0eaf8, #192e4b);
 }
 body {
   background-image: none;
@@ -48,9 +50,9 @@ body {
   padding-inline: 1.35rem;
 }
 .button.primary {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
+  background: #0868db;
+  color: #fff;
+  border-color: #0868db;
   box-shadow: 0 3px 0 color-mix(in srgb, var(--ink) 12%, transparent);
 }
 .button.primary:hover {
@@ -819,7 +821,7 @@ h2 {
   font-size: 0.9rem;
 }
 .dock-cta .ink {
-  background: #f05b35;
+  background: #ff7510;
   color: #251c16;
 }
 .dock-cta .cta-github {
@@ -872,7 +874,7 @@ h2 {
   transition: transform 0.4s;
 }
 .theme-preview-content i:first-child {
-  background: #f05b35;
+  background: #ff7510;
 }
 .theme-choice-check {
   background: var(--accent-ink);
@@ -934,7 +936,7 @@ h2 {
   border-color: var(--line);
 }
 ::selection {
-  background: #f05b3540;
+  background: #ff751040;
 }
 p > a:not(.button) {
   text-decoration: underline;

@@ -162,6 +162,13 @@ for (const width of [320, 360, 390, 768, 1440, 3840]) {
       ).toBe(true);
       if (path === "/") {
         await expect(page.locator(".routing-drawing")).toBeVisible();
+        const drawingBounds = await page
+          .locator(".routing-drawing")
+          .boundingBox();
+        const hubBounds = await page.locator(".router-float").boundingBox();
+        expect(hubBounds?.width).toBeLessThanOrEqual(
+          (drawingBounds?.width ?? 0) * 0.5,
+        );
         expect(
           await page
             .locator(".routing-drawing")

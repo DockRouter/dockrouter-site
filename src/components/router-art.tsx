@@ -1,4 +1,4 @@
-import { RouterMark } from "./logo";
+import { RouterGlyph, RouterMark } from "./logo";
 export function RouterArt() {
   return (
     <figure
@@ -96,11 +96,8 @@ export function RouterArt() {
           <path d="m232 277 85 49M232 291l85 49" stroke="var(--diagram-line)" />
           <path d="m366 326 76-44" stroke="var(--amber)" strokeWidth="3" />
           <circle cx="447" cy="309" r="3" fill="var(--green)" />
-          <g transform="translate(297 187) scale(1.35 .78)">
-            <path d="M8 18h16l8 14-8 14H8l8-14z" fill="var(--ink)" />
-            <path d="M56 18H40l-8 14 8 14h16l-8-14z" fill="var(--amber)" />
-            <path d="M24 8h16M24 56h16" stroke="var(--ink)" strokeWidth="4" />
-            <circle cx="32" cy="32" r="4" fill="var(--surface)" />
+          <g transform="translate(297 187) scale(.16875 .0975)">
+            <RouterGlyph />
           </g>
         </g>
         <g fontFamily="monospace" fontSize="10" fill="var(--muted)">
