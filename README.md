@@ -38,7 +38,7 @@ The repository name `wirerift/wirefift-site` follows the name requested for this
 - Product behavior, commands and download assets were checked against the upstream README, Go module, Compose configuration and v1.7.0 release on 2026-10-17. Update `src/lib/site.ts` and verify the release matrix before changing the displayed version.
 - The terminal and inspector contain labeled illustrative examples. They do not connect to a tunnel server or send webhook requests.
 - The appearance picker and OXOGNET SVG signature are adapted from [CobaltDB's website](https://github.com/cobaltdb/cobaltdb-site) at the user's request. Its MIT notice is retained at `public/licenses/cobaltdb-site.txt`.
-- The WireRift symbol is an original SVG interpretation of the supplied brand reference. Logos, social preview and app icon are in `public/`. `node scripts/brand.mjs` regenerates them using Sharp, a dependency supplied by Next.js.
+- The WireRift symbol is an original SVG interpretation of the supplied brand reference. Logos, social preview and app icon are in `public/`. `npm run brand` regenerates the shared React wordmark, outlined SVG assets, compact favicon and raster previews using Fontkit and Sharp. Geometry lives in `src/lib/brand-geometry.ts`; both the website and downloads use it. Typeface outlines come from the bundled, OFL-licensed Geist font; exported logos do not require a font installation.
 - Geist, Geist Mono and Lucide notices are retained in `public/licenses/`.
 
 The website is MIT licensed. Third-party marks retain their respective ownership.

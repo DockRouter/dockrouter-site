@@ -31,6 +31,24 @@ export default function Brand() {
           </div>
         </article>
         <article className="brand-card">
+          <div className="brand-preview stacked-brand">
+            <picture>
+              <img
+                src="/logo-stacked.svg"
+                alt="WireRift — Localhost to the world"
+                width="400"
+                height="320"
+              />
+            </picture>
+          </div>
+          <div className="brand-card-bottom">
+            <span>Stacked logo & tagline</span>
+            <a href="/logo-stacked.svg" download>
+              Download SVG <ArrowDownToLine size={15} />
+            </a>
+          </div>
+        </article>
+        <article className="brand-card">
           <div className="brand-preview">
             <RiftMark />
           </div>
@@ -45,7 +63,7 @@ export default function Brand() {
       <section className="doc-section">
         <h2>A small, intentional palette.</h2>
         <p>
-          Amber for the spark. Deep green for the wire. Warm paper for a little
+          Amber for the spark. Deep navy for the wire. Warm paper for a little
           breathing room.
         </p>
         <div className="brand-colors">
@@ -57,9 +75,9 @@ export default function Brand() {
           </div>
           <div
             className="brand-color"
-            style={{ background: "#1b241d", color: "#fffdf8" }}
+            style={{ background: "#0e3048", color: "#fffdf8" }}
           >
-            Wire ink<code>#1B241D</code>
+            Wire navy<code>#0E3048</code>
           </div>
           <div
             className="brand-color"

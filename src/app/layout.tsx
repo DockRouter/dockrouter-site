@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     description,
     images: ["/og.png"],
   },
-  icons: { icon: "/logo-mark.svg", apple: "/apple-touch-icon.png" },
+  icons: { icon: "/favicon.svg", apple: "/apple-touch-icon.png" },
 };
 export const viewport: Viewport = {
   width: "device-width",

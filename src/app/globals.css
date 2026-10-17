@@ -3114,3 +3114,25 @@ fieldset {
     padding-inline: 0.5rem;
   }
 }
+/* The mark and outlined wordmark share the reference artwork's navy. */
+.logo,
+.rift-mark {
+  color: light-dark(#0e3048, #e7edf0);
+}
+.logo .logo-type,
+.brand-preview .logo > .logo-type {
+  width: 4.05em;
+  height: 1.2em;
+}
+.stacked-brand {
+  background: #fffdf8;
+}
+.stacked-brand picture {
+  width: min(100%, 22rem);
+  padding: 1rem;
+}
+.stacked-brand img {
+  width: 100%;
+  height: auto;
+  display: block;
+}

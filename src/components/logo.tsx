@@ -1,34 +1,63 @@
+import { rayEnd, riftGeometry as shape } from "@/lib/brand-geometry";
+import { wordmark } from "@/lib/wordmark";
+
 export function RiftMark({ className = "" }: { className?: string }) {
   return (
     <svg
-      className={className}
-      viewBox="0 0 80 80"
+      className={`rift-mark ${className}`}
+      viewBox="0 0 128 128"
       fill="none"
       aria-hidden="true"
     >
-      <circle cx="40" cy="40" r="30" fill="#F5AD21" />
-      <path
-        d="M2 25h15c11 0 18 15 25 19l-10-2 5 9C26 46 22 35 14 35H2zM78 55H63c-11 0-18-15-25-19l10 2-5-9c11 5 15 16 23 16h12z"
-        fill="currentColor"
-      />
-      <path
-        d="m47 10-8 24 11-3-16 20 9-3-11 24 2-22-10 4 15-22-9 2z"
+      <circle {...shape.disc} fill="#F5AD21" />
+      {shape.wires.map((d) => (
+        <path
+          key={d}
+          d={d}
+          fill="currentColor"
+          stroke="var(--logo-cut, #fffdf8)"
+          strokeWidth="3.2"
+          strokeLinejoin="round"
+          paintOrder="stroke"
+        />
+      ))}
+      <g
         fill="var(--logo-cut, #fffdf8)"
-      />
+        stroke="var(--logo-cut, #fffdf8)"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      >
+        {shape.rays.map((p) => (
+          <g key={`${p.ex}:${p.ey}`}>
+            <path d={`M${p.x} ${p.y} ${p.ex} ${p.ey}`} stroke="#F5AD21" />
+            <path d={`M${p.x} ${p.y} ${rayEnd(p).x} ${rayEnd(p).y}`} />
+            <circle
+              cx={p.ex}
+              cy={p.ey}
+              r={p.r}
+              stroke="none"
+              fill={rayEnd(p).outer ? "#F5AD21" : "var(--logo-cut, #fffdf8)"}
+            />
+          </g>
+        ))}
+        <path
+          d={shape.arrow}
+          strokeLinecap="butt"
+          stroke="#F5AD21"
+          fill="#F5AD21"
+        />
+        {shape.sparks.map((p) => (
+          <circle key={p.cx} {...p} stroke="none" />
+        ))}
+      </g>
       <path
-        d="m48 12-9 24 10-3-14 18 8-3-11 22"
-        stroke="currentColor"
-        strokeWidth="2.4"
-        strokeLinejoin="round"
+        d={shape.bolt}
+        fill="currentColor"
+        stroke="var(--logo-cut, #fffdf8)"
+        strokeWidth="3.8"
+        strokeLinejoin="miter"
+        paintOrder="stroke"
       />
-      <g stroke="var(--logo-cut, #fffdf8)" strokeWidth="1.8">
-        <path d="m45 31 17-14M47 35l19-5M43 27l8-15" />
-      </g>
-      <g fill="var(--logo-cut, #fffdf8)">
-        <circle cx="63" cy="16" r="2.8" />
-        <circle cx="68" cy="29" r="2.8" />
-        <circle cx="52" cy="10" r="2.8" />
-      </g>
     </svg>
   );
 }
@@ -36,10 +65,21 @@ export function Logo() {
   return (
     <span className="logo">
       <RiftMark />
-      <span>
-        wire<span className="logo-rift">rift</span>
-        <span className="logo-period">.</span>
-      </span>
+      <svg
+        className="logo-type"
+        viewBox={`0 0 ${wordmark.width} 64`}
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        {wordmark.paths.map((p) => (
+          <path
+            key={p.x}
+            d={p.d}
+            transform={`translate(${p.x} ${51 - p.y}) scale(${wordmark.scale} ${-wordmark.scale})`}
+          />
+        ))}
+      </svg>
+      <span className="sr-only">WireRift</span>
     </span>
   );
 }
