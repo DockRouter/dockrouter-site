@@ -56,8 +56,8 @@ body {
   box-shadow: 0 3px 0 color-mix(in srgb, var(--ink) 12%, transparent);
 }
 .button.primary:hover {
-  background: var(--accent-ink);
-  border-color: var(--accent-ink);
+  background: #0759bd;
+  border-color: #0759bd;
 }
 .button.secondary {
   background: var(--surface);
