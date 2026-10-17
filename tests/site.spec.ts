@@ -78,6 +78,60 @@ test("route explorer follows the selected container without a backend request", 
   );
   expect(requests).toEqual([]);
 });
+test("hero request follows its selected route, pauses and replays", async ({
+  page,
+}) => {
+  await page.clock.install();
+  await page.goto("/");
+  await page.clock.runFor(200);
+  const hero = page.locator(".hero-routing");
+  await expect(hero).toHaveAttribute("data-playing", "true");
+  await page
+    .getByRole("button", { name: "Route to Realtime", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Route to Realtime", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(hero.locator(".hero-incoming")).toContainText("GET /socket");
+  await page.clock.runFor(1200);
+  await expect(hero.locator('[aria-current="step"]')).toContainText("Secure");
+  await page.getByRole("button", { name: "Pause routing animation" }).click();
+  await page.clock.runFor(10000);
+  await expect(hero.locator('[aria-current="step"]')).toContainText("Secure");
+  await page.getByRole("button", { name: "Play routing animation" }).click();
+  await page.clock.runFor(1300);
+  await expect(hero.locator('[aria-current="step"]')).toContainText("Match");
+  await page.clock.runFor(1400);
+  await expect(hero.locator(".hero-route-result")).toContainText("200 OK");
+  await expect(hero.locator(".hero-route-result")).toContainText(
+    "live.example.com",
+  );
+  await page.getByRole("button", { name: "Replay hero request" }).click();
+  await expect(hero.locator('[aria-current="step"]')).toContainText("Receive");
+});
+test("hero respects reduced motion while keeping destination selection useful", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await expect(
+    page.getByRole("button", {
+      name: "Animation disabled by reduced motion preference",
+    }),
+  ).toBeDisabled();
+  await page
+    .getByRole("button", { name: "Route to Web app", exact: true })
+    .click();
+  await expect(page.locator(".hero-route-result")).toContainText(
+    "app.example.com",
+  );
+  await expect(page.locator(".hero-route-result")).toContainText("200 OK");
+  await page.getByRole("button", { name: "Replay hero request" }).click();
+  await expect(page.locator(".hero-routing")).toHaveAttribute(
+    "data-playing",
+    "false",
+  );
+});
 test("all six downloads match the verified release matrix", async ({
   page,
 }) => {

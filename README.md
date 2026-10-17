@@ -37,3 +37,7 @@ Push to main. `.github/workflows/deploy.yml` runs lint, static export, typecheck
 - Geist and Geist Mono are bundled locally. Lucide provides interface icons. Third-party license notices are included in `public/licenses/`.
 
 MIT licensed. Third-party marks retain their ownership.
+
+## Hero routing scene
+
+The hero uses the owner-supplied anchor upright at the center of an interactive SVG routing scene. Four synchronized stages show receive, TLS termination, route matching and forwarding. Destination buttons select the web/API/realtime example; pause and replay controls are keyboard accessible. Animation timers stop outside the viewport or in a hidden document. Reduced-motion mode shows a completed route while preserving destination selection. All displayed traffic is illustrative.

@@ -7,6 +7,7 @@ import "@fontsource-variable/geist-mono";
 import "./globals.css";
 import "./appearance.css";
 import "./dockrouter.css";
+import "./hero.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
