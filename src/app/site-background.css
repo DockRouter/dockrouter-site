@@ -1,6 +1,5 @@
 body {
   isolation: isolate;
-  padding-bottom: 48px;
 }
 .site-background,
 .site-interaction-layer {
@@ -129,47 +128,65 @@ body {
 .site-interaction-layer * {
   pointer-events: none;
 }
-.site-motion-toggle {
-  position: fixed;
-  right: max(8px, env(safe-area-inset-right));
-  bottom: max(8px, env(safe-area-inset-bottom));
-  z-index: 60;
+.motion-control {
+  position: relative;
+  flex-shrink: 0;
+}
+.motion-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 1px solid var(--line);
-  border-radius: 50%;
-  background: var(--paper);
+  border-radius: 0.625rem;
+  background: var(--surface);
   color: var(--muted);
-  font: 400 0.65rem var(--mono);
 }
-.site-motion-toggle:hover:not(:disabled) {
+.motion-toggle[aria-pressed="true"],
+.motion-toggle:hover {
   color: var(--accent-ink);
-  border-color: var(--accent-ink);
 }
-.site-motion-toggle:disabled {
-  cursor: default;
+.motion-toggle:hover {
+  border-color: var(--accent-ink);
+  background: var(--surface-soft);
+}
+.motion-toggle:focus-visible {
+  outline: 3px solid var(--accent-ink);
+  outline-offset: 3px;
+}
+.motion-tooltip {
+  position: absolute;
+  inset-block-start: calc(100% + 10px);
+  inset-inline-end: 0;
+  width: max-content;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.75rem;
+  pointer-events: none;
+  visibility: hidden;
+}
+.motion-control:hover .motion-tooltip,
+.motion-control:focus-within .motion-tooltip {
+  visibility: visible;
 }
 .hero-scene .dock-hero {
   padding-block: clamp(56px, 5vw, 88px) clamp(40px, 4vw, 72px);
 }
 @media (max-width: 600px) {
-  .site-motion-toggle {
-    width: 40px;
-    padding: 0;
-    border-radius: 50%;
-  }
-  .site-motion-toggle > span {
-    display: none;
-  }
   .hero-scene .dock-hero {
     padding-top: 40px;
   }
   .background-network {
     opacity: 0.6;
+  }
+}
+@media (max-width: 400px) {
+  .header-inner .logo .logo-type {
+    display: none;
   }
 }

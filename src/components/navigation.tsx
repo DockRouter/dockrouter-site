@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { docs } from "@/lib/docs";
 import { REPO } from "@/lib/site";
 import { Logo } from "./logo";
+import { MotionToggle } from "./motion-toggle";
 import { ThemePicker } from "./theme-picker";
 
 export function Navigation() {
@@ -93,6 +94,7 @@ export function Navigation() {
               <kbd>⌘ K</kbd>
             </button>
             <ThemePicker />
+            <MotionToggle />
             <a
               href={REPO}
               className="header-github"

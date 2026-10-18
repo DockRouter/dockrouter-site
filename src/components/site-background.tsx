@@ -1,7 +1,7 @@
 "use client";
 
-import { Pause, Play } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef } from "react";
+import { useMotionPreference } from "@/lib/motion-preference";
 import { createSiteBackground } from "@/lib/site-background";
 
 export function SiteBackground() {
@@ -10,9 +10,7 @@ export function SiteBackground() {
   const scene = useRef<SVGGElement>(null);
   const interactionSvg = useRef<SVGSVGElement>(null);
   const interactionScene = useRef<SVGGElement>(null);
-  const engine = useRef<ReturnType<typeof createSiteBackground> | null>(null);
-  const [paused, setPaused] = useState(false);
-  const [reduced, setReduced] = useState(false);
+  const preference = useMotionPreference();
 
   useEffect(() => {
     if (
@@ -27,17 +25,12 @@ export function SiteBackground() {
       scene.current,
       interactionSvg.current,
       interactionScene.current,
-      (mode) => setReduced(mode === "reduced"),
+      preference,
     );
-    engine.current = field;
     return () => {
       field.destroy();
-      engine.current = null;
     };
-  }, []);
-  useEffect(() => {
-    engine.current?.setPaused(paused);
-  }, [paused]);
+  }, [preference]);
 
   return (
     <>
@@ -88,32 +81,6 @@ export function SiteBackground() {
           <g ref={interactionScene} />
         </svg>
       </div>
-      <button
-        type="button"
-        className="site-motion-toggle"
-        aria-label={
-          reduced
-            ? "Background motion disabled by your preference"
-            : paused
-              ? "Play background animation"
-              : "Pause background animation"
-        }
-        aria-pressed={paused || reduced}
-        title={
-          reduced
-            ? "Background motion disabled by your preference"
-            : paused
-              ? "Play background animation"
-              : "Pause background animation"
-        }
-        disabled={reduced}
-        onClick={() => setPaused((value) => !value)}
-      >
-        {paused || reduced ? <Play size={14} /> : <Pause size={14} />}
-        <span className="sr-only">
-          {reduced ? "Still mode" : paused ? "Resume motion" : "Pause motion"}
-        </span>
-      </button>
     </>
   );
 }

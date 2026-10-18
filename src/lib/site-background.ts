@@ -87,10 +87,11 @@ export function createSiteBackground(
   scene: SVGGElement,
   interactionSvg: SVGSVGElement,
   interactionScene: SVGGElement,
-  onMode: (mode: Mode) => void,
+  preference: "on" | "off" | "reduced",
   config: Config = BACKGROUND_CONFIG,
 ) {
-  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+  const reduced = preference === "reduced";
+  const enabled = preference === "on";
   const network = svgElement("g", { class: "background-network" });
   const maskId = svg.querySelector("mask")?.id;
   if (maskId) network.setAttribute("mask", `url(#${maskId})`);
@@ -152,7 +153,7 @@ export function createSiteBackground(
   let scroll = window.scrollY;
   let targetScroll = scroll;
   let frame = 0;
-  let paused = false;
+  const paused = preference === "off";
   let visible = false;
   let destroyed = false;
   let mode: Mode | undefined;
@@ -351,7 +352,7 @@ export function createSiteBackground(
     render(0);
   }
   function render(dt: number) {
-    const still = reduced.matches;
+    const still = !enabled;
     const pointerRadius = config.pointerRadius * (width < 800 ? 0.65 : 1);
     const waveRadius = config.waveRadius * (width < 800 ? 0.6 : 1);
     activity +=
@@ -624,7 +625,7 @@ export function createSiteBackground(
   }
   function sync() {
     if (destroyed) return;
-    const next: Mode = reduced.matches
+    const next: Mode = reduced
       ? "reduced"
       : paused
         ? "paused"
@@ -637,7 +638,6 @@ export function createSiteBackground(
       mode = next;
       svg.dataset.motion = mode;
       interactionSvg.dataset.motion = mode;
-      onMode(mode);
     }
     if (frame) cancelAnimationFrame(frame);
     frame = 0;
@@ -806,33 +806,29 @@ export function createSiteBackground(
     sync();
   });
   const size = new ResizeObserver(resize);
-  intersection.observe(svg);
   size.observe(svg);
-  document.addEventListener("pointermove", move, { passive: true });
-  document.addEventListener("pointerdown", pointerDown, { passive: true });
-  document.addEventListener("pointerup", pointerUp, { passive: true });
-  document.addEventListener("pointercancel", leave, { passive: true });
-  document.documentElement.addEventListener("pointerleave", leave, {
-    passive: true,
-  });
-  document.addEventListener("visibilitychange", sync);
-  window.addEventListener("blur", leave);
-  window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", resize, { passive: true });
-  reduced.addEventListener("change", sync);
+  if (enabled) {
+    intersection.observe(svg);
+    document.addEventListener("pointermove", move, { passive: true });
+    document.addEventListener("pointerdown", pointerDown, { passive: true });
+    document.addEventListener("pointerup", pointerUp, { passive: true });
+    document.addEventListener("pointercancel", leave, { passive: true });
+    document.documentElement.addEventListener("pointerleave", leave, {
+      passive: true,
+    });
+    document.addEventListener("visibilitychange", sync);
+    window.addEventListener("blur", leave);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", resize, { passive: true });
+  }
   resize();
   sync();
   return {
-    setPaused(value: boolean) {
-      paused = value;
-      sync();
-    },
     destroy() {
       destroyed = true;
       cancelAnimationFrame(frame);
       intersection.disconnect();
       size.disconnect();
-      reduced.removeEventListener("change", sync);
       document.removeEventListener("pointermove", move);
       document.removeEventListener("pointerdown", pointerDown);
       document.removeEventListener("pointerup", pointerUp);

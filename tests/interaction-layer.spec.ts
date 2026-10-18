@@ -4,7 +4,9 @@ import { expect, type Page, test } from "@playwright/test";
 async function setup(page: Page) {
   await mkdir(".qa/interaction", { recursive: true });
   await page.clock.install({ time: new Date("2026-01-01T00:00:00Z") });
-  await page.clock.pauseAt(new Date("2026-01-01T00:00:01Z"));
+  // Pause on the blank page before loading the app. A one-second target can
+  // already be in the past if the host stalls between these two commands.
+  await page.clock.pauseAt(new Date("2026-01-02T00:00:00Z"));
   await page.goto("/");
   await page.clock.runFor(1600);
 }

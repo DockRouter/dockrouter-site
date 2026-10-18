@@ -12,7 +12,8 @@ const active = (page: Page, kind: string) =>
     .locator(`[data-${kind}]:not([style*="display: none"])`);
 async function setup(page: Page) {
   await page.clock.install({ time: new Date("2026-01-01T00:00:00Z") });
-  await page.clock.pauseAt(new Date("2026-01-01T00:00:01Z"));
+  // The app has not loaded yet; reserve a future target beyond host jitter.
+  await page.clock.pauseAt(new Date("2026-01-02T00:00:00Z"));
   await page.goto("/");
   await page.clock.runFor(1500);
   await expect(field(page)).toHaveAttribute("data-motion", "running");
@@ -103,7 +104,7 @@ test("shared background spans scrolling sections, footer and client navigation w
   await mkdir(".qa/svg", { recursive: true });
   await page.screenshot({ path: ".qa/svg/footer-wide.png" });
   await page
-    .getByRole("button", { name: "Pause background animation", exact: true })
+    .getByRole("button", { name: "Animasyonları kapat", exact: true })
     .click();
   const paused = await picture(page);
   await page.clock.runFor(4000);
@@ -116,7 +117,7 @@ test("shared background spans scrolling sections, footer and client navigation w
   await expect(field(page)).toHaveAttribute("data-test-instance", "persistent");
   await expect(field(page)).toHaveAttribute("data-motion", "paused");
   await page
-    .getByRole("button", { name: "Play background animation", exact: true })
+    .getByRole("button", { name: "Animasyonları aç", exact: true })
     .press("Enter");
   await page.clock.runFor(200);
   expect(await picture(page)).not.toBe(paused);
@@ -175,9 +176,9 @@ test("reduced motion is still while theme and preference changes remain useful",
   await expect(field(page)).toHaveAttribute("data-motion", "reduced");
   await expect(
     page.getByRole("button", {
-      name: "Background motion disabled by your preference",
+      name: "Animasyonları aç",
     }),
-  ).toBeDisabled();
+  ).toHaveAttribute("aria-pressed", "false");
   const still = await picture(page);
   await page.mouse.click(700, 120);
   await page.clock.runFor(3000);
