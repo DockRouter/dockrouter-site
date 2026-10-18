@@ -15,8 +15,8 @@ async function setup(page: Page) {
   // The app has not loaded yet; reserve a future target beyond host jitter.
   await page.clock.pauseAt(new Date("2026-01-02T00:00:00Z"));
   await page.goto("/");
-  await page.clock.runFor(1500);
   await expect(field(page)).toHaveAttribute("data-motion", "running");
+  await page.clock.runFor(1500);
 }
 
 test("SVG field reacts locally, caps successive clicks, expires and excludes controls", async ({

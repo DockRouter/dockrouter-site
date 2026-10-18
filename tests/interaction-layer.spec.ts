@@ -8,6 +8,10 @@ async function setup(page: Page) {
   // already be in the past if the host stalls between these two commands.
   await page.clock.pauseAt(new Date("2026-01-02T00:00:00Z"));
   await page.goto("/");
+  await expect(page.locator(".site-background > svg")).toHaveAttribute(
+    "data-motion",
+    "running",
+  );
   await page.clock.runFor(1600);
 }
 
