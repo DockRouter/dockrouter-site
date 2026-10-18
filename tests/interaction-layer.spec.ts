@@ -2,11 +2,107 @@ import { mkdir } from "node:fs/promises";
 import { expect, type Page, test } from "@playwright/test";
 
 async function setup(page: Page) {
+  await mkdir(".qa/interaction", { recursive: true });
   await page.clock.install({ time: new Date("2026-01-01T00:00:00Z") });
   await page.clock.pauseAt(new Date("2026-01-01T00:00:01Z"));
   await page.goto("/");
   await page.clock.runFor(1600);
 }
+
+test("nearby shapes orbit a stationary pointer smoothly while distant shapes stay calm", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await setup(page);
+  const positions = () =>
+    page.locator("[data-object]").evaluateAll((nodes) =>
+      nodes.map((node) => {
+        const m = (node as SVGGElement).transform.baseVal.consolidate()?.matrix;
+        return { x: m?.e ?? 0, y: m?.f ?? 0 };
+      }),
+    );
+  const before = await positions();
+  const index = 10;
+  const center = { x: before[index].x + 65, y: before[index].y + 15 };
+  await page.mouse.move(center.x, center.y);
+  await page.clock.runFor(400);
+  const first = (await positions())[index];
+  let previous = first;
+  for (let i = 0; i < 12; i++) {
+    await page.clock.runFor(100);
+    const current = (await positions())[index];
+    expect(
+      Math.hypot(current.x - previous.x, current.y - previous.y),
+    ).toBeLessThan(14);
+    previous = current;
+  }
+  const start = Math.atan2(first.y - center.y, first.x - center.x);
+  const end = Math.atan2(previous.y - center.y, previous.x - center.x);
+  const sweep = Math.atan2(Math.sin(end - start), Math.cos(end - start));
+  expect(sweep).toBeGreaterThan(0.35);
+  const after = await positions();
+  expect(
+    Math.hypot(after[24].x - before[24].x, after[24].y - before[24].y),
+  ).toBeLessThan(3);
+  await page.screenshot({ path: ".qa/interaction/organic-orbit.png" });
+});
+
+test("a click relays a fading pulse between neighboring shapes without growing the SVG", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await setup(page);
+  const total = await page
+    .locator(".site-background svg *, .site-interaction-layer svg *")
+    .count();
+  const center = await page
+    .locator('[data-object="10"]')
+    .evaluate((el: SVGGElement) => {
+      const m = el.transform.baseVal.consolidate()?.matrix;
+      return { x: m?.e ?? 0, y: m?.f ?? 0 };
+    });
+  await page.mouse.click(center.x, center.y);
+  await page.mouse.move(1439, 899);
+  const peaks = new Map<number, { radius: number; time: number }>();
+  for (let time = 100; time <= 2000; time += 100) {
+    await page.clock.runFor(100);
+    const pulses = await page
+      .locator('[data-response]:not([style*="display: none"])')
+      .evaluateAll((nodes) =>
+        nodes.map((el) => ({
+          source: Number(el.getAttribute("data-source")),
+          radius: Number(el.querySelector("circle")?.getAttribute("r")),
+        })),
+      );
+    for (const pulse of pulses) {
+      if (pulse.radius > (peaks.get(pulse.source)?.radius ?? 8))
+        peaks.set(pulse.source, { radius: pulse.radius, time });
+    }
+    if (time === 800)
+      await page.screenshot({ path: ".qa/interaction/chain-reaction.png" });
+  }
+  const first = peaks.get(10);
+  expect(first?.radius).toBeGreaterThan(15);
+  const followers = [...peaks].filter(([source]) => source !== 10);
+  expect(followers.length).toBeGreaterThanOrEqual(2);
+  expect(
+    followers.some(([, pulse]) => pulse.time > (first?.time ?? 0) + 200),
+  ).toBe(true);
+  expect(
+    followers.every(([, pulse]) => pulse.radius < (first?.radius ?? 0)),
+  ).toBe(true);
+  await page.clock.runFor(1000);
+  await expect(
+    page
+      .locator('[data-response] circle[r]:not([r="7"])')
+      .filter({ visible: true }),
+  ).toHaveCount(0);
+  expect(
+    await page
+      .locator(".site-background svg *, .site-interaction-layer svg *")
+      .count(),
+  ).toBe(total);
+});
 
 for (const theme of ["light", "dark"]) {
   test(`pointer light trails remain visible over headings and opaque routing cards in ${theme}`, async ({

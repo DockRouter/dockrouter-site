@@ -70,3 +70,11 @@ Moved transient effects into an independent fixed SVG body child at z-index 45, 
 The new heading-hover regression failed on the old export because zero trails were drawn over text. Light/dark text and opaque-card variants pass on the split layers. New coverage also checks body-level stacking, absence of foreground masks, click/scroll coordinate stability, real text selection and link navigation. Screenshots are retained under `.qa/interaction/`.
 
 Final local lint, static export and typecheck passed, followed by all **41/41** browser tests. The full run includes the six-size layout matrix, both themes, 4K and mobile SVG checks, bounded repeated effects, reduced motion, lifecycle/frame budgets and automated WCAG AA. Foreground screenshots over the routing card and across scrolled section boundaries were visually reviewed. Touch gestures use Chromium emulation; no physical-device performance claim is made.
+
+## Organic pointer current and chained pulses
+
+Nearby anchored shapes now follow depth-dependent orbital currents with distance falloff and eased return. A click schedules progressively weaker pulses through existing route neighbors, with up to three hops, eight desktop/four mobile relays and a two-second lifetime. Relays reuse the eight foreground responders, cannot spawn waves or SVG nodes, and preserve the existing opacity and 30/60 frame budgets.
+
+New clock-driven browser coverage measures angular travel around a stationary pointer, limits movement between samples and checks a distant control. A second case observes delayed, weaker pulse peaks on successive neighbors, expiry and unchanged SVG node count. The first chain run exposed a reach limit that stopped before the second neighbor; the reach was corrected without changing these assertions. Orbital and chain screenshots were visually reviewed in `.qa/interaction/`.
+
+Final local lint, typecheck and static export passed. The 43-case browser run passed 41 checks; two existing cases hit the 30-second test limit during screenshot/context teardown, with no failing layout assertion. An unchanged single-worker rerun passed both cases plus the two 1920px theme controls (4/4). The animation-specific checks, six responsive sizes, touch/reduced motion and automated contrast coverage all have passing results; the local full run is not recorded as 43/43.

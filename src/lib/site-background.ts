@@ -6,6 +6,10 @@ export const BACKGROUND_CONFIG = {
   mobileRows: 4,
   pointerRadius: 270,
   displacement: 62,
+  orbitSpeed: 0.95,
+  chainSpeed: 950,
+  chainLife: 0.65,
+  maxRelays: 8,
   glowRadius: 112,
   maxResponders: 8,
   waveImpulse: 38,
@@ -17,7 +21,7 @@ export const BACKGROUND_CONFIG = {
   idleFps: 30,
   idleAfter: 4,
   waveRadius: 300,
-  waveLife: 1.65,
+  waveLife: 2,
   maxWaves: 5,
   maxSparks: 30,
   maxTrails: 8,
@@ -34,6 +38,10 @@ type Port = Point & {
   depth: number;
   element: SVGGElement;
   visible: boolean;
+  orbit: number;
+  echo: number;
+  echoFrom: Point | null;
+  neighbors: Port[];
 };
 type Route = {
   from: Port;
@@ -43,7 +51,8 @@ type Route = {
   seed: number;
 };
 type Effect = Point & { age: number; element: SVGGElement };
-type Wave = Effect & { variant: number };
+type Relay = { delay: number; gain: number; from: Point; hops: number };
+type Wave = Effect & { variant: number; relays: Map<Port, Relay> };
 type Spark = Effect & { vx: number; vy: number };
 type Trail = Effect & { fromX: number; fromY: number };
 
@@ -164,7 +173,14 @@ export function createSiteBackground(
     );
     show(element, false);
     effects.append(element);
-    return { x: 0, y: 0, age: Infinity, variant: 0, element };
+    return {
+      x: 0,
+      y: 0,
+      age: Infinity,
+      variant: 0,
+      relays: new Map(),
+      element,
+    };
   });
   const sparks: Spark[] = Array.from({ length: config.maxSparks }, (_, i) => {
     const element = svgElement("g", {
@@ -199,6 +215,7 @@ export function createSiteBackground(
       effect.age = Infinity;
       show(effect.element, false);
     }
+    for (const wave of waves) wave.relays.clear();
   }
   function edgeFade(x: number, y: number) {
     return smooth(clamp(Math.min(x, width - x, y, height - y) / 65));
@@ -282,6 +299,10 @@ export function createSiteBackground(
           depth: 0.35 + (seed % 4) * 0.2,
           element,
           visible: true,
+          orbit: 0,
+          echo: 0,
+          echoFrom: null,
+          neighbors: [],
         });
       }
     }
@@ -321,6 +342,10 @@ export function createSiteBackground(
         }
       }
     }
+    for (const route of routes) {
+      route.from.neighbors.push(route.to);
+      route.to.neighbors.push(route.from);
+    }
     network.replaceChildren(lines, geometry);
     clearEffects();
     render(0);
@@ -358,8 +383,19 @@ export function createSiteBackground(
       const dy = baseY - pointer.y;
       const distance = Math.hypot(dx, dy);
       const force = (1 - clamp(distance / pointerRadius)) ** 2 * pointerWeight;
+      const influence =
+        smooth(1 - clamp((distance - 55) / (pointerRadius - 55))) *
+        pointerWeight;
+      // Each depth follows a slightly different current; the anchor springs back
+      // as the pointer leaves rather than snapping to a new orbit center.
+      port.orbit +=
+        dt * config.orbitSpeed * influence * (0.65 + port.depth * 0.5);
+      const orbitX = dx * Math.cos(port.orbit) - dy * Math.sin(port.orbit);
+      const orbitY = dx * Math.sin(port.orbit) + dy * Math.cos(port.orbit);
       let impulseX = 0;
       let impulseY = 0;
+      port.echo = 0;
+      port.echoFrom = null;
       for (const wave of waves) {
         if (wave.age >= config.waveLife) continue;
         const radius = waveRadius * (1 - (1 - wave.age / config.waveLife) ** 3);
@@ -370,17 +406,34 @@ export function createSiteBackground(
           config.waveImpulse;
         impulseX += ((port.bx - wave.x) / Math.max(dist, 1)) * power;
         impulseY += ((baseY - wave.y) / Math.max(dist, 1)) * power;
+        const relay = wave.relays.get(port);
+        if (!relay) continue;
+        const age = wave.age - relay.delay;
+        if (age < 0 || age >= config.chainLife) continue;
+        const pulse =
+          Math.sin((age / config.chainLife) * Math.PI) ** 2 * relay.gain;
+        if (pulse > port.echo) {
+          port.echo = pulse;
+          port.echoFrom = relay.from;
+        }
+        const rx = port.bx - relay.from.x;
+        const ry = baseY - relay.from.y;
+        const length = Math.max(1, Math.hypot(rx, ry));
+        impulseX += ((rx - ry * 0.55) / length) * pulse * config.waveImpulse;
+        impulseY += ((ry + rx * 0.55) / length) * pulse * config.waveImpulse;
       }
       const drift = still ? 0 : activity * port.depth;
       const targetX =
         port.bx +
         Math.sin(elapsed * config.driftSpeed + i) * 7 * drift +
-        (dx / Math.max(distance, 1)) * force * config.displacement +
+        (orbitX - dx) * influence +
+        (dx / Math.max(distance, 1)) * force * config.displacement * 0.45 +
         impulseX;
       const targetY =
         baseY +
         Math.cos(elapsed * config.driftSpeed * 0.8 + i) * 11 * drift +
-        (dy / Math.max(distance, 1)) * force * config.displacement +
+        (orbitY - dy) * influence +
+        (dy / Math.max(distance, 1)) * force * config.displacement * 0.45 +
         impulseY;
       const easing =
         !dt || still || Math.abs(port.y - targetY) > height / 2
@@ -421,7 +474,8 @@ export function createSiteBackground(
       .map((port, index) => {
         const distance = Math.hypot(port.x - pointer.x, port.y - pointer.y);
         let strength =
-          pointerWeight * (1 - clamp(distance / pointerRadius)) ** 1.4;
+          pointerWeight * (1 - clamp(distance / pointerRadius)) ** 1.4 +
+          port.echo;
         for (const wave of waves) {
           if (wave.age >= config.waveLife) continue;
           const radius =
@@ -449,16 +503,24 @@ export function createSiteBackground(
       translate(response.element, port.x, port.y);
       response.element.setAttribute("data-source", String(source.index));
       response.element.setAttribute("opacity", String(strength * 0.65));
-      const dx = pointer.x - port.x;
-      const dy = pointer.y - port.y;
+      response.element.children[1].setAttribute(
+        "r",
+        String(7 + port.echo * 14),
+      );
+      const origin = port.echoFrom ?? pointer;
+      const dx = origin.x - port.x;
+      const dy = origin.y - port.y;
       const length = Math.max(1, Math.hypot(dx, dy));
       const endX = dx * Math.max(0, 1 - 24 / length);
       const endY = dy * Math.max(0, 1 - 24 / length);
       response.link.setAttribute(
         "d",
-        `M0 0Q${(dx * 0.45).toFixed(2)} ${(dy * 0.15).toFixed(2)} ${endX.toFixed(2)} ${endY.toFixed(2)}`,
+        `M0 0Q${(dx * 0.5 - dy * 0.2).toFixed(2)} ${(dy * 0.5 + dx * 0.2).toFixed(2)} ${endX.toFixed(2)} ${endY.toFixed(2)}`,
       );
-      response.link.setAttribute("opacity", String(pointerWeight * 0.45));
+      response.link.setAttribute(
+        "opacity",
+        String(Math.max(pointerWeight, port.echo) * 0.4),
+      );
     }
     for (const route of routes) {
       const visible =
@@ -643,6 +705,60 @@ export function createSiteBackground(
       time: event.timeStamp,
     };
   }
+  function relayWave(wave: Wave) {
+    wave.relays.clear();
+    const nearest = ports.reduce<Port | null>((best, port) => {
+      if (!port.visible) return best;
+      return !best ||
+        Math.hypot(port.x - wave.x, port.y - wave.y) <
+          Math.hypot(best.x - wave.x, best.y - wave.y)
+        ? port
+        : best;
+    }, null);
+    const reach = config.waveRadius * (width < 800 ? 0.6 : 1);
+    if (!nearest || Math.hypot(nearest.x - wave.x, nearest.y - wave.y) > reach)
+      return;
+    // A bounded shortest-arrival walk through the existing route graph. Relays
+    // cannot spawn more waves or allocate SVG nodes, even during rapid clicks.
+    const queue = [
+      {
+        port: nearest,
+        delay: 0.08,
+        gain: 1,
+        from: { x: wave.x, y: wave.y },
+        hops: 0,
+      },
+    ];
+    const limit = width < 800 ? 4 : config.maxRelays;
+    while (queue.length && wave.relays.size < limit) {
+      queue.sort((a, b) => a.delay - b.delay);
+      const next = queue.shift();
+      if (!next || wave.relays.has(next.port)) continue;
+      wave.relays.set(next.port, next);
+      if (next.hops >= 3) continue;
+      for (const neighbor of next.port.neighbors) {
+        const distance = Math.hypot(
+          neighbor.x - next.port.x,
+          neighbor.y - next.port.y,
+        );
+        const delay = next.delay + 0.12 + distance / config.chainSpeed;
+        if (
+          !neighbor.visible ||
+          wave.relays.has(neighbor) ||
+          delay > 1.25 ||
+          Math.hypot(neighbor.x - wave.x, neighbor.y - wave.y) > reach * 2.2
+        )
+          continue;
+        queue.push({
+          port: neighbor,
+          delay,
+          gain: next.gain * 0.7,
+          from: next.port,
+          hops: next.hops + 1,
+        });
+      }
+    }
+  }
   function pointerUp(event: PointerEvent) {
     if (!down || down.id !== event.pointerId) return;
     const start = down;
@@ -668,6 +784,7 @@ export function createSiteBackground(
       variant,
     });
     wave.element.setAttribute("data-variant", String(variant));
+    relayWave(wave);
     const count = width < 800 ? 4 : 8;
     for (let i = 0; i < count; i++) {
       const spark = sparks[sparkCursor++ % sparks.length];
