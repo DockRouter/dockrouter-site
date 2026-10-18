@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useId, useRef } from "react";
-import { useMotionPreference } from "@/lib/motion-preference";
+import {
+  useAmbientMotionEnabled,
+  useMotionPreference,
+} from "@/lib/motion-preference";
 import { createSiteBackground } from "@/lib/site-background";
 
 export function SiteBackground() {
@@ -10,7 +13,9 @@ export function SiteBackground() {
   const scene = useRef<SVGGElement>(null);
   const interactionSvg = useRef<SVGSVGElement>(null);
   const interactionScene = useRef<SVGGElement>(null);
+  const engine = useRef<ReturnType<typeof createSiteBackground> | null>(null);
   const preference = useMotionPreference();
+  const ambientEnabled = useAmbientMotionEnabled();
 
   useEffect(() => {
     if (
@@ -25,12 +30,25 @@ export function SiteBackground() {
       scene.current,
       interactionSvg.current,
       interactionScene.current,
-      preference,
+      "off",
+      ambientEnabled,
     );
+    engine.current = field;
     return () => {
       field.destroy();
+      engine.current = null;
     };
-  }, [preference]);
+  }, [ambientEnabled]);
+
+  useEffect(() => {
+    engine.current?.setInteractionPreference(
+      ambientEnabled
+        ? preference
+        : preference === "reduced"
+          ? "reduced"
+          : "off",
+    );
+  }, [preference, ambientEnabled]);
 
   return (
     <>

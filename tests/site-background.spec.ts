@@ -6,6 +6,10 @@ const picture = (page: Page) =>
   page
     .locator(".site-background > svg > g, .site-interaction-layer > svg > g")
     .evaluateAll((nodes) => nodes.map((node) => node.outerHTML).join(""));
+const foreground = (page: Page) =>
+  page
+    .locator(".site-interaction-layer svg > g")
+    .evaluateAll((nodes) => nodes.map((node) => node.outerHTML).join(""));
 const active = (page: Page, kind: string) =>
   page
     .locator(".site-interaction-layer")
@@ -85,7 +89,7 @@ test("SVG field reacts locally, caps successive clicks, expires and excludes con
   await expect(page).toHaveURL(/#quickstart$/);
 });
 
-test("shared background spans scrolling sections, footer and client navigation without resetting pause", async ({
+test("shared background spans sections and navigation without resetting the mouse preference", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
@@ -104,23 +108,27 @@ test("shared background spans scrolling sections, footer and client navigation w
   await mkdir(".qa/svg", { recursive: true });
   await page.screenshot({ path: ".qa/svg/footer-wide.png" });
   await page
-    .getByRole("button", { name: "Animasyonları kapat", exact: true })
+    .getByRole("button", { name: "Disable mouse effects", exact: true })
     .click();
-  const paused = await picture(page);
+  const paused = await foreground(page);
   await page.clock.runFor(4000);
-  expect(await picture(page)).toBe(paused);
+  expect(await foreground(page)).toBe(paused);
   await page
     .getByRole("link", { name: "Documentation", exact: true })
     .first()
     .click();
   await expect(page).toHaveURL(/\/docs\/getting-started\//);
   await expect(field(page)).toHaveAttribute("data-test-instance", "persistent");
-  await expect(field(page)).toHaveAttribute("data-motion", "paused");
+  await expect(field(page)).toHaveAttribute("data-motion", "running");
+  await expect(page.locator(".site-interaction-layer > svg")).toHaveAttribute(
+    "data-motion",
+    "paused",
+  );
   await page
-    .getByRole("button", { name: "Animasyonları aç", exact: true })
+    .getByRole("button", { name: "Enable mouse effects", exact: true })
     .press("Enter");
   await page.clock.runFor(200);
-  expect(await picture(page)).not.toBe(paused);
+  expect(await foreground(page)).not.toBe(paused);
   await page
     .getByRole("heading", { name: "Meet DockRouter", exact: true })
     .waitFor();
@@ -176,7 +184,7 @@ test("reduced motion is still while theme and preference changes remain useful",
   await expect(field(page)).toHaveAttribute("data-motion", "reduced");
   await expect(
     page.getByRole("button", {
-      name: "Animasyonları aç",
+      name: "Enable mouse effects",
     }),
   ).toHaveAttribute("aria-pressed", "false");
   const still = await picture(page);

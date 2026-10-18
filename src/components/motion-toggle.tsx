@@ -5,10 +5,10 @@ import { setMotionEnabled, useMotionPreference } from "@/lib/motion-preference";
 
 export function MotionToggle() {
   const enabled = useMotionPreference() === "on";
-  const label = enabled ? "Animasyonları kapat" : "Animasyonları aç";
+  const label = enabled ? "Disable mouse effects" : "Enable mouse effects";
   const Icon = enabled ? Mouse : MouseOff;
   return (
-    <div className="motion-control" lang="tr">
+    <div className="motion-control">
       <button
         type="button"
         className="motion-toggle"

@@ -2,12 +2,18 @@ import { mkdir } from "node:fs/promises";
 import { expect, type Page, test } from "@playwright/test";
 
 const field = (page: Page) => page.locator(".site-background > svg");
+const interaction = (page: Page) =>
+  page.locator(".site-interaction-layer > svg");
 const graphic = (page: Page) =>
   page
-    .locator(".site-background svg > g, .site-interaction-layer svg > g")
+    .locator(".site-interaction-layer svg > g")
     .evaluateAll((nodes) => nodes.map((node) => node.outerHTML).join(""));
+const ambient = (page: Page) =>
+  field(page)
+    .locator(":scope > g")
+    .evaluate((el) => el.outerHTML);
 
-test("header motion toggle releases input listeners, clears effects and keeps the hero functional", async ({
+test("mouse toggle releases pointer listeners while ambient motion and hero keep playing", async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -71,7 +77,11 @@ test("header motion toggle releases input listeners, clears effects and keeps th
   await page.clock.install();
   await page.goto("/");
   await page.clock.runFor(1600);
-  await expect(field(page)).toHaveAttribute("data-motion", "paused");
+  await expect(interaction(page)).toHaveAttribute("data-motion", "paused");
+  await expect(field(page)).toHaveAttribute("data-motion", "running");
+  await field(page)
+    .locator('[data-object="10"]')
+    .evaluate((el) => el.setAttribute("data-continuity", "kept"));
   const listenerCount = () =>
     page.evaluate(() =>
       (
@@ -81,26 +91,35 @@ test("header motion toggle releases input listeners, clears effects and keeps th
   const baseline = await listenerCount();
   for (let i = 0; i < 3; i++) {
     const on = page.getByRole("button", {
-      name: "Animasyonları aç",
+      name: "Enable mouse effects",
       exact: true,
     });
     await on.focus();
     await on.press(i % 2 ? "Space" : "Enter");
-    await expect(field(page)).toHaveAttribute("data-motion", "running");
-    expect(await listenerCount()).toBe(baseline + 9);
+    await expect(interaction(page)).toHaveAttribute("data-motion", "running");
+    await expect(field(page).locator('[data-object="10"]')).toHaveAttribute(
+      "data-continuity",
+      "kept",
+    );
+    expect(await listenerCount()).toBe(baseline + 6);
     await page.mouse.click(700, 120);
     await page.clock.runFor(180);
     expect(
       await page.locator('[data-wave]:not([style*="display: none"])').count(),
     ).toBeGreaterThan(0);
     const off = page.getByRole("button", {
-      name: "Animasyonları kapat",
+      name: "Disable mouse effects",
       exact: true,
     });
-    await expect(off).toHaveAttribute("title", "Animasyonları kapat");
+    await expect(off).toHaveAttribute("title", "Disable mouse effects");
     await expect(off).toHaveAttribute("aria-pressed", "true");
     await off.click();
-    await expect(field(page)).toHaveAttribute("data-motion", "paused");
+    await expect(interaction(page)).toHaveAttribute("data-motion", "paused");
+    await expect(field(page)).toHaveAttribute("data-motion", "running");
+    await expect(field(page).locator('[data-object="10"]')).toHaveAttribute(
+      "data-continuity",
+      "kept",
+    );
     expect(await listenerCount()).toBe(baseline);
     await expect(
       page.locator('[data-wave]:not([style*="display: none"])'),
@@ -109,10 +128,12 @@ test("header motion toggle releases input listeners, clears effects and keeps th
       page.locator(".site-interaction-layer > svg > g"),
     ).toHaveAttribute("opacity", "0");
     const still = await graphic(page);
+    const drifting = await ambient(page);
     await page.mouse.move(500, 200);
     await page.mouse.click(700, 120);
     await page.clock.runFor(2000);
     expect(await graphic(page)).toBe(still);
+    expect(await ambient(page)).not.toBe(drifting);
   }
   expect(
     await page.evaluate(() => localStorage.getItem("dockrouter-motion")),
@@ -138,7 +159,7 @@ test("motion choice survives reload and navigation; explicit choice overrides th
   await page.goto("/");
   await expect(field(page)).toHaveAttribute("data-motion", "reduced");
   const enable = page.getByRole("button", {
-    name: "Animasyonları aç",
+    name: "Enable mouse effects",
     exact: true,
   });
   await expect(enable).toBeEnabled();
@@ -151,16 +172,24 @@ test("motion choice survives reload and navigation; explicit choice overrides th
   await expect(field(page)).toHaveAttribute("data-motion", "running");
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page
-    .getByRole("button", { name: "Animasyonları kapat", exact: true })
+    .getByRole("button", { name: "Disable mouse effects", exact: true })
     .click();
   await page
     .getByRole("link", { name: "Documentation", exact: true })
     .first()
     .click();
   await expect(page).toHaveURL(/\/docs\/getting-started\//);
-  await expect(field(page)).toHaveAttribute("data-motion", "paused");
+  await expect(interaction(page)).toHaveAttribute("data-motion", "paused");
+  await expect(field(page)).toHaveAttribute("data-motion", "running");
   await page.reload();
-  await expect(field(page)).toHaveAttribute("data-motion", "paused");
+  await expect(interaction(page)).toHaveAttribute("data-motion", "paused");
+  await expect(field(page)).toHaveAttribute("data-motion", "running");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(field(page)).toHaveAttribute("data-motion", "reduced");
+  await expect(interaction(page)).toHaveAttribute("data-motion", "paused");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await expect(field(page)).toHaveAttribute("data-motion", "running");
+  await expect(interaction(page)).toHaveAttribute("data-motion", "paused");
 });
 
 test("motion toggle works without storage and synchronizes cross-tab changes", async ({
@@ -175,11 +204,11 @@ test("motion toggle works without storage and synchronizes cross-tab changes", a
   );
   await page.goto("/");
   await page
-    .getByRole("button", { name: "Animasyonları kapat", exact: true })
+    .getByRole("button", { name: "Disable mouse effects", exact: true })
     .click();
-  await expect(field(page)).toHaveAttribute("data-motion", "paused");
+  await expect(interaction(page)).toHaveAttribute("data-motion", "paused");
   await page
-    .getByRole("button", { name: "Animasyonları aç", exact: true })
+    .getByRole("button", { name: "Enable mouse effects", exact: true })
     .click();
   await expect(field(page)).toHaveAttribute("data-motion", "running");
   await page.evaluate(() =>
@@ -191,9 +220,9 @@ test("motion toggle works without storage and synchronizes cross-tab changes", a
     ),
   );
   await expect(
-    page.getByRole("button", { name: "Animasyonları aç", exact: true }),
+    page.getByRole("button", { name: "Enable mouse effects", exact: true }),
   ).toHaveAttribute("aria-pressed", "false");
-  await expect(field(page)).toHaveAttribute("data-motion", "paused");
+  await expect(interaction(page)).toHaveAttribute("data-motion", "paused");
 });
 
 for (const width of [320, 375, 768, 1440]) {
@@ -203,7 +232,7 @@ for (const width of [320, 375, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const button = page.getByRole("button", {
-      name: "Animasyonları kapat",
+      name: "Disable mouse effects",
       exact: true,
     });
     await expect(button).toBeVisible();

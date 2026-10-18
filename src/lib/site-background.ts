@@ -30,7 +30,7 @@ export const BACKGROUND_CONFIG = {
 } as const;
 
 type Config = { [Key in keyof typeof BACKGROUND_CONFIG]: number };
-type Mode = "running" | "paused" | "reduced" | "hidden" | "offscreen";
+type Mode = "running" | "reduced" | "hidden" | "offscreen";
 type Point = { x: number; y: number };
 type Port = Point & {
   bx: number;
@@ -88,16 +88,20 @@ export function createSiteBackground(
   interactionSvg: SVGSVGElement,
   interactionScene: SVGGElement,
   preference: "on" | "off" | "reduced",
+  ambientEnabled: boolean,
   config: Config = BACKGROUND_CONFIG,
 ) {
-  const reduced = preference === "reduced";
-  const enabled = preference === "on";
+  const reduced = !ambientEnabled;
+  let mousePreference = preference;
+  let enabled = preference === "on";
+  let pointerListening = false;
   const network = svgElement("g", { class: "background-network" });
   const maskId = svg.querySelector("mask")?.id;
   if (maskId) network.setAttribute("mask", `url(#${maskId})`);
   const effects = svgElement("g", { class: "background-effects" });
   scene.append(network);
   interactionScene.append(effects);
+  interactionScene.setAttribute("opacity", "0");
   const pointerField = svgElement("g", {
     class: "pointer-field",
     "data-pointer-field": "",
@@ -153,7 +157,6 @@ export function createSiteBackground(
   let scroll = window.scrollY;
   let targetScroll = scroll;
   let frame = 0;
-  const paused = preference === "off";
   let visible = false;
   let destroyed = false;
   let mode: Mode | undefined;
@@ -352,7 +355,7 @@ export function createSiteBackground(
     render(0);
   }
   function render(dt: number) {
-    const still = !enabled;
+    const still = !ambientEnabled;
     const pointerRadius = config.pointerRadius * (width < 800 ? 0.65 : 1);
     const waveRadius = config.waveRadius * (width < 800 ? 0.6 : 1);
     activity +=
@@ -366,10 +369,11 @@ export function createSiteBackground(
       "opacity",
       String(still ? 1 : smooth(clamp(elapsed / 1.2))),
     );
-    interactionScene.setAttribute(
-      "opacity",
-      String(still ? 0 : smooth(clamp(elapsed / 0.7))),
-    );
+    if (enabled)
+      interactionScene.setAttribute(
+        "opacity",
+        String(still ? 0 : smooth(clamp(elapsed / 0.7))),
+      );
     for (let i = 0; i < ports.length; i++) {
       const port = ports[i];
       const baseY = still
@@ -451,77 +455,79 @@ export function createSiteBackground(
         String(edgeFade(port.x, port.y) * (0.5 + port.depth * 0.3)),
       );
     }
-    show(pointerField, !still && pointerWeight > 0.015);
-    if (!still && pointerWeight > 0.015) {
-      translate(pointerField, pointer.x, pointer.y);
-      pointerField.setAttribute(
-        "opacity",
-        String(pointerWeight * (0.6 + activity * 0.4)),
-      );
-      pointerField.children[0].setAttribute(
-        "r",
-        String(config.glowRadius * (width < 800 ? 0.65 : 1)),
-      );
-      pointerField.children[1].setAttribute(
-        "transform",
-        `rotate(${elapsed * 24})`,
-      );
-      pointerField.children[2].setAttribute(
-        "transform",
-        `rotate(${-elapsed * 38})`,
-      );
-    }
-    const responses = ports
-      .map((port, index) => {
-        const distance = Math.hypot(port.x - pointer.x, port.y - pointer.y);
-        let strength =
-          pointerWeight * (1 - clamp(distance / pointerRadius)) ** 1.4 +
-          port.echo;
-        for (const wave of waves) {
-          if (wave.age >= config.waveLife) continue;
-          const radius =
-            waveRadius * (1 - (1 - wave.age / config.waveLife) ** 3);
-          const waveDistance = Math.hypot(port.x - wave.x, port.y - wave.y);
-          strength +=
-            Math.exp(-(((waveDistance - radius) / 48) ** 2)) *
-            (1 - wave.age / config.waveLife);
-        }
-        return {
-          port,
-          index,
-          strength: clamp(strength) * edgeFade(port.x, port.y),
-        };
-      })
-      .sort((a, b) => b.strength - a.strength);
-    for (let i = 0; i < responders.length; i++) {
-      const response = responders[i];
-      const source = responses[i];
-      const visible =
-        !still && source && source.strength > 0.015 && source.port.visible;
-      show(response.element, Boolean(visible));
-      if (!visible) continue;
-      const { port, strength } = source;
-      translate(response.element, port.x, port.y);
-      response.element.setAttribute("data-source", String(source.index));
-      response.element.setAttribute("opacity", String(strength * 0.65));
-      response.element.children[1].setAttribute(
-        "r",
-        String(7 + port.echo * 14),
-      );
-      const origin = port.echoFrom ?? pointer;
-      const dx = origin.x - port.x;
-      const dy = origin.y - port.y;
-      const length = Math.max(1, Math.hypot(dx, dy));
-      const endX = dx * Math.max(0, 1 - 24 / length);
-      const endY = dy * Math.max(0, 1 - 24 / length);
-      response.link.setAttribute(
-        "d",
-        `M0 0Q${(dx * 0.5 - dy * 0.2).toFixed(2)} ${(dy * 0.5 + dx * 0.2).toFixed(2)} ${endX.toFixed(2)} ${endY.toFixed(2)}`,
-      );
-      response.link.setAttribute(
-        "opacity",
-        String(Math.max(pointerWeight, port.echo) * 0.4),
-      );
+    if (enabled) {
+      show(pointerField, !still && pointerWeight > 0.015);
+      if (!still && pointerWeight > 0.015) {
+        translate(pointerField, pointer.x, pointer.y);
+        pointerField.setAttribute(
+          "opacity",
+          String(pointerWeight * (0.6 + activity * 0.4)),
+        );
+        pointerField.children[0].setAttribute(
+          "r",
+          String(config.glowRadius * (width < 800 ? 0.65 : 1)),
+        );
+        pointerField.children[1].setAttribute(
+          "transform",
+          `rotate(${elapsed * 24})`,
+        );
+        pointerField.children[2].setAttribute(
+          "transform",
+          `rotate(${-elapsed * 38})`,
+        );
+      }
+      const responses = ports
+        .map((port, index) => {
+          const distance = Math.hypot(port.x - pointer.x, port.y - pointer.y);
+          let strength =
+            pointerWeight * (1 - clamp(distance / pointerRadius)) ** 1.4 +
+            port.echo;
+          for (const wave of waves) {
+            if (wave.age >= config.waveLife) continue;
+            const radius =
+              waveRadius * (1 - (1 - wave.age / config.waveLife) ** 3);
+            const waveDistance = Math.hypot(port.x - wave.x, port.y - wave.y);
+            strength +=
+              Math.exp(-(((waveDistance - radius) / 48) ** 2)) *
+              (1 - wave.age / config.waveLife);
+          }
+          return {
+            port,
+            index,
+            strength: clamp(strength) * edgeFade(port.x, port.y),
+          };
+        })
+        .sort((a, b) => b.strength - a.strength);
+      for (let i = 0; i < responders.length; i++) {
+        const response = responders[i];
+        const source = responses[i];
+        const visible =
+          !still && source && source.strength > 0.015 && source.port.visible;
+        show(response.element, Boolean(visible));
+        if (!visible) continue;
+        const { port, strength } = source;
+        translate(response.element, port.x, port.y);
+        response.element.setAttribute("data-source", String(source.index));
+        response.element.setAttribute("opacity", String(strength * 0.65));
+        response.element.children[1].setAttribute(
+          "r",
+          String(7 + port.echo * 14),
+        );
+        const origin = port.echoFrom ?? pointer;
+        const dx = origin.x - port.x;
+        const dy = origin.y - port.y;
+        const length = Math.max(1, Math.hypot(dx, dy));
+        const endX = dx * Math.max(0, 1 - 24 / length);
+        const endY = dy * Math.max(0, 1 - 24 / length);
+        response.link.setAttribute(
+          "d",
+          `M0 0Q${(dx * 0.5 - dy * 0.2).toFixed(2)} ${(dy * 0.5 + dx * 0.2).toFixed(2)} ${endX.toFixed(2)} ${endY.toFixed(2)}`,
+        );
+        response.link.setAttribute(
+          "opacity",
+          String(Math.max(pointerWeight, port.echo) * 0.4),
+        );
+      }
     }
     for (const route of routes) {
       const visible =
@@ -552,6 +558,7 @@ export function createSiteBackground(
         String(alpha * Math.sin(t * Math.PI) * (0.4 + activity * 0.6)),
       );
     }
+    if (!enabled) return;
     for (const wave of waves) {
       wave.age += dt;
       show(wave.element, wave.age < config.waveLife);
@@ -627,17 +634,19 @@ export function createSiteBackground(
     if (destroyed) return;
     const next: Mode = reduced
       ? "reduced"
-      : paused
-        ? "paused"
-        : document.hidden
-          ? "hidden"
-          : !visible
-            ? "offscreen"
-            : "running";
+      : document.hidden
+        ? "hidden"
+        : !visible
+          ? "offscreen"
+          : "running";
     if (mode !== next) {
       mode = next;
       svg.dataset.motion = mode;
-      interactionSvg.dataset.motion = mode;
+      interactionSvg.dataset.motion = enabled
+        ? mode
+        : mousePreference === "reduced"
+          ? "reduced"
+          : "paused";
     }
     if (frame) cancelAnimationFrame(frame);
     frame = 0;
@@ -647,11 +656,6 @@ export function createSiteBackground(
     if (mode === "running") frame = requestAnimationFrame(tick);
     else {
       leave();
-      if (mode === "paused") {
-        clearEffects();
-        pointerWeight = 0;
-        interactionScene.setAttribute("opacity", "0");
-      }
       if (mode === "reduced") {
         clearEffects();
         pointerWeight = 0;
@@ -801,41 +805,68 @@ export function createSiteBackground(
   function onScroll() {
     targetScroll = window.scrollY;
   }
+  function listenToPointer(active: boolean) {
+    if (pointerListening === active) return;
+    pointerListening = active;
+    if (active) {
+      document.addEventListener("pointermove", move, { passive: true });
+      document.addEventListener("pointerdown", pointerDown, { passive: true });
+      document.addEventListener("pointerup", pointerUp, { passive: true });
+      document.addEventListener("pointercancel", leave, { passive: true });
+      document.documentElement.addEventListener("pointerleave", leave, {
+        passive: true,
+      });
+      window.addEventListener("blur", leave);
+    } else {
+      document.removeEventListener("pointermove", move);
+      document.removeEventListener("pointerdown", pointerDown);
+      document.removeEventListener("pointerup", pointerUp);
+      document.removeEventListener("pointercancel", leave);
+      document.documentElement.removeEventListener("pointerleave", leave);
+      window.removeEventListener("blur", leave);
+    }
+  }
   const intersection = new IntersectionObserver((entries) => {
     visible = entries.some((entry) => entry.isIntersecting);
     sync();
   });
   const size = new ResizeObserver(resize);
   size.observe(svg);
-  if (enabled) {
+  listenToPointer(enabled);
+  if (ambientEnabled) {
     intersection.observe(svg);
-    document.addEventListener("pointermove", move, { passive: true });
-    document.addEventListener("pointerdown", pointerDown, { passive: true });
-    document.addEventListener("pointerup", pointerUp, { passive: true });
-    document.addEventListener("pointercancel", leave, { passive: true });
-    document.documentElement.addEventListener("pointerleave", leave, {
-      passive: true,
-    });
     document.addEventListener("visibilitychange", sync);
-    window.addEventListener("blur", leave);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", resize, { passive: true });
   }
   resize();
   sync();
   return {
+    setInteractionPreference(next: "on" | "off" | "reduced") {
+      if (destroyed) return;
+      mousePreference = next;
+      enabled = next === "on";
+      listenToPointer(enabled);
+      leave();
+      clearEffects();
+      pointerWeight = 0;
+      lastInput = -10;
+      lastTrail = -10;
+      lastBurst = -10;
+      interactionScene.setAttribute("opacity", "0");
+      interactionSvg.dataset.motion = enabled
+        ? (mode ?? "offscreen")
+        : next === "reduced"
+          ? "reduced"
+          : "paused";
+    },
     destroy() {
       destroyed = true;
       cancelAnimationFrame(frame);
       intersection.disconnect();
       size.disconnect();
-      document.removeEventListener("pointermove", move);
-      document.removeEventListener("pointerdown", pointerDown);
-      document.removeEventListener("pointerup", pointerUp);
-      document.removeEventListener("pointercancel", leave);
-      document.documentElement.removeEventListener("pointerleave", leave);
+      listenToPointer(false);
       document.removeEventListener("visibilitychange", sync);
-      window.removeEventListener("blur", leave);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", resize);
       network.remove();

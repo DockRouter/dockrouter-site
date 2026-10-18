@@ -45,6 +45,14 @@ export function useMotionPreference() {
   return useSyncExternalStore(subscribe, snapshot, () => "off" as const);
 }
 
+function ambientSnapshot() {
+  return snapshot() === "on" || !matchMedia(query).matches;
+}
+
+export function useAmbientMotionEnabled() {
+  return useSyncExternalStore(subscribe, ambientSnapshot, () => false);
+}
+
 export function setMotionEnabled(enabled: boolean) {
   const value = enabled ? "on" : "off";
   document.documentElement.dataset.backgroundMotion = value;
