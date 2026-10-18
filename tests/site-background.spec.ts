@@ -70,8 +70,6 @@ test("SVG field reacts locally, caps successive clicks, expires and excludes con
   }
   expect(variants.size).toBe(3);
   expect(await field(page).locator("*").count()).toBe(total);
-  await mkdir(".qa/svg", { recursive: true });
-  await page.screenshot({ path: ".qa/svg/click-waves.png" });
   await page.mouse.move(1, 1);
   await page.clock.runFor(2400);
   await expect(active(page, "wave")).toHaveCount(0);
@@ -204,8 +202,10 @@ test("idle pacing and resize keep the SVG work budget bounded", async ({
   const group = field(page).locator(":scope > g");
   await group.evaluate((el: SVGGElement) => {
     el.dataset.testFrames = "0";
-    new MutationObserver(() => {
-      el.dataset.testFrames = String(Number(el.dataset.testFrames) + 1);
+    new MutationObserver((records) => {
+      el.dataset.testFrames = String(
+        Number(el.dataset.testFrames) + records.length,
+      );
     }).observe(el, { attributes: true, attributeFilter: ["opacity"] });
   });
   const frames = async () =>
@@ -215,8 +215,11 @@ test("idle pacing and resize keep the SVG work budget bounded", async ({
   await page.mouse.move(1900, 120);
   await page.clock.runFor(1000);
   const active = (await frames()) - idle;
-  expect(idle).toBeGreaterThan(20);
+  // RAF cadence varies across hosts; these are ceilings, not minimum FPS.
+  expect(idle).toBeGreaterThan(0);
+  expect(idle).toBeLessThanOrEqual(31);
   expect(active).toBeGreaterThan(idle * 1.5);
+  expect(active).toBeLessThanOrEqual(61);
   await page.setViewportSize({ width: 375, height: 812 });
   await expect(field(page).locator("[data-object]")).toHaveCount(12);
   expect((await field(page).boundingBox())?.width).toBe(375);

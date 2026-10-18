@@ -86,6 +86,8 @@ export function createSiteBackground(
   let routes: Route[] = [];
   let elapsed = 0;
   let previous = 0;
+  let frameBudget = 0;
+  let sincePaint = 0;
   let lastInput = -10;
   let lastTrail = -10;
   let lastBurst = -10;
@@ -413,11 +415,18 @@ export function createSiteBackground(
       elapsed - lastInput > config.idleAfter
         ? config.idleFps
         : config.activeFps;
-    if (!previous || stamp - previous >= 1000 / fps - 1) {
-      const dt = previous ? Math.min((stamp - previous) / 1000, 0.05) : 0;
-      previous = stamp;
-      elapsed += dt;
-      render(dt);
+    const dt = previous ? Math.min((stamp - previous) / 1000, 0.05) : 0;
+    previous = stamp;
+    frameBudget += dt;
+    sincePaint += dt;
+    const interval = 1 / fps;
+    // Carry the remainder instead of rounding to a multiple of the RAF cadence.
+    if (frameBudget + 1e-9 >= interval) {
+      elapsed += sincePaint;
+      render(sincePaint);
+      sincePaint = 0;
+      frameBudget = Math.max(0, frameBudget - interval);
+      if (frameBudget >= interval) frameBudget %= interval;
     }
     frame = requestAnimationFrame(tick);
   }
@@ -444,6 +453,8 @@ export function createSiteBackground(
     if (frame) cancelAnimationFrame(frame);
     frame = 0;
     previous = 0;
+    frameBudget = 0;
+    sincePaint = 0;
     if (mode === "running") frame = requestAnimationFrame(tick);
     else {
       leave();
