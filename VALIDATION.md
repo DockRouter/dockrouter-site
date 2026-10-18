@@ -60,3 +60,13 @@ The first SVG CI run passed 37 checks and caught an inappropriate minimum-FPS as
 The stricter probe reproduced 62 active updates in a simulated second with 16ms RAF intervals. The renderer now carries a fractional frame budget and measures physics time separately, preserving the 30/60 ceilings without snapping every render to a multiple of the host's RAF interval. Visibility/pause transitions reset both timing accumulators.
 
 Console-error coverage also reproduced Windows export prefetch 404s: Next.js emitted `__next.docs/$d$slug/__PAGE__.txt` while the client requested `__next.docs.$d$slug.__PAGE__.txt`. The export normalizer now adds dotted aliases for nested segment files, preserving the original files. The same browser checks cover those requests.
+
+## Continuous foreground interaction layer
+
+The reported straight-edge cuts were reproduced as occlusion: all effects were in the global z-index -1 SVG, behind opaque cards and panels. The network's quiet-center mask also reduced visual strength; pointer tracking already used document-level viewport coordinates, but the trail filter excluded headings, paragraphs and entire routing panels. Card overflow/isolation belongs to their local illustrations and is preserved.
+
+Moved transient effects into an independent fixed SVG body child at z-index 45, without a readability or section mask. The ambient SVG retains its quiet mask. Added cursor light/streaks and eight pooled foreground junction responses; increased local pointer radius/displacement and wave impulses, keeping finite lifetimes, fixed pools and 30/60 frame budgets. Interaction coordinates use client positions without scroll offsets. Controls, selection drags and native touch scrolling remain excluded from bursts; text/card hover continues to render. Pause and reduced motion clear the foreground.
+
+The new heading-hover regression failed on the old export because zero trails were drawn over text. Light/dark text and opaque-card variants pass on the split layers. New coverage also checks body-level stacking, absence of foreground masks, click/scroll coordinate stability, real text selection and link navigation. Screenshots are retained under `.qa/interaction/`.
+
+Final local lint, static export and typecheck passed, followed by all **41/41** browser tests. The full run includes the six-size layout matrix, both themes, 4K and mobile SVG checks, bounded repeated effects, reduced motion, lifecycle/frame budgets and automated WCAG AA. Foreground screenshots over the routing card and across scrolled section boundaries were visually reviewed. Touch gestures use Chromium emulation; no physical-device performance claim is made.

@@ -8,14 +8,26 @@ export function SiteBackground() {
   const id = useId().replaceAll(":", "");
   const svg = useRef<SVGSVGElement>(null);
   const scene = useRef<SVGGElement>(null);
+  const interactionSvg = useRef<SVGSVGElement>(null);
+  const interactionScene = useRef<SVGGElement>(null);
   const engine = useRef<ReturnType<typeof createSiteBackground> | null>(null);
   const [paused, setPaused] = useState(false);
   const [reduced, setReduced] = useState(false);
 
   useEffect(() => {
-    if (!svg.current || !scene.current) return;
-    const field = createSiteBackground(svg.current, scene.current, (mode) =>
-      setReduced(mode === "reduced"),
+    if (
+      !svg.current ||
+      !scene.current ||
+      !interactionSvg.current ||
+      !interactionScene.current
+    )
+      return;
+    const field = createSiteBackground(
+      svg.current,
+      scene.current,
+      interactionSvg.current,
+      interactionScene.current,
+      (mode) => setReduced(mode === "reduced"),
     );
     engine.current = field;
     return () => {
@@ -52,6 +64,28 @@ export function SiteBackground() {
             </mask>
           </defs>
           <g ref={scene} />
+        </svg>
+      </div>
+      <div className="site-interaction-layer" aria-hidden="true">
+        <svg
+          ref={interactionSvg}
+          xmlns="http://www.w3.org/2000/svg"
+          width="100%"
+          height="100%"
+          focusable="false"
+        >
+          <defs>
+            <radialGradient id={`${id}-pointer-light`}>
+              <stop offset="0" stopColor="var(--field-glow)" />
+              <stop
+                offset=".45"
+                stopColor="var(--field-glow)"
+                stopOpacity=".45"
+              />
+              <stop offset="1" stopColor="var(--field-glow)" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          <g ref={interactionScene} />
         </svg>
       </div>
       <button

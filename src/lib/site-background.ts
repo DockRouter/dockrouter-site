@@ -4,21 +4,25 @@ export const BACKGROUND_CONFIG = {
   desktopRows: 5,
   mobileColumns: 3,
   mobileRows: 4,
-  pointerRadius: 180,
-  displacement: 26,
+  pointerRadius: 270,
+  displacement: 62,
+  glowRadius: 112,
+  maxResponders: 8,
+  waveImpulse: 38,
+  sparkSpeed: 145,
   parallax: 0.065,
   driftSpeed: 0.16,
   packetSpeed: 0.07,
   activeFps: 60,
   idleFps: 30,
   idleAfter: 4,
-  waveRadius: 210,
-  waveLife: 1.8,
+  waveRadius: 300,
+  waveLife: 1.65,
   maxWaves: 5,
   maxSparks: 30,
   maxTrails: 8,
   sparkLife: 1.2,
-  trailLife: 0.65,
+  trailLife: 0.8,
 } as const;
 
 type Config = { [Key in keyof typeof BACKGROUND_CONFIG]: number };
@@ -41,13 +45,14 @@ type Route = {
 type Effect = Point & { age: number; element: SVGGElement };
 type Wave = Effect & { variant: number };
 type Spark = Effect & { vx: number; vy: number };
+type Trail = Effect & { fromX: number; fromY: number };
 
 const namespace = "http://www.w3.org/2000/svg";
 const clamp = (value: number, min = 0, max = 1) =>
   Math.max(min, Math.min(max, value));
 const smooth = (value: number) => value * value * (3 - 2 * value);
 const interactive =
-  "a,button,input,select,textarea,label,summary,[role=button],[role=dialog],dialog,.site-header,.hero-routing,pre,code,table,p,h1,h2,h3,h4,li,blockquote,[data-background-ignore]";
+  "a,button,input,select,textarea,label,summary,[role=button],[role=tab],[role=radio],[role=dialog],dialog,[contenteditable=true],[data-background-ignore]";
 
 function svgElement<K extends keyof SVGElementTagNameMap>(
   tag: K,
@@ -71,6 +76,8 @@ const translate = (element: SVGElement, x: number, y: number) =>
 export function createSiteBackground(
   svg: SVGSVGElement,
   scene: SVGGElement,
+  interactionSvg: SVGSVGElement,
+  interactionScene: SVGGElement,
   onMode: (mode: Mode) => void,
   config: Config = BACKGROUND_CONFIG,
 ) {
@@ -79,7 +86,47 @@ export function createSiteBackground(
   const maskId = svg.querySelector("mask")?.id;
   if (maskId) network.setAttribute("mask", `url(#${maskId})`);
   const effects = svgElement("g", { class: "background-effects" });
-  scene.append(network, effects);
+  scene.append(network);
+  interactionScene.append(effects);
+  const pointerField = svgElement("g", {
+    class: "pointer-field",
+    "data-pointer-field": "",
+    opacity: 0,
+  });
+  const glowId = interactionSvg.querySelector("radialGradient")?.id;
+  pointerField.append(
+    svgElement("circle", {
+      r: config.glowRadius,
+      fill: `url(#${glowId})`,
+      class: "pointer-glow",
+    }),
+    svgElement("circle", {
+      r: 44,
+      class: "pointer-orbit",
+      "stroke-dasharray": "14 64 25 174",
+    }),
+    svgElement("circle", {
+      r: 19,
+      class: "pointer-orbit pointer-inner",
+      "stroke-dasharray": "6 54",
+    }),
+  );
+  interactionScene.prepend(pointerField);
+  const responders = Array.from({ length: config.maxResponders }, (_, i) => {
+    const element = svgElement("g", {
+      "data-response": i,
+      class: "pointer-response",
+    });
+    const link = svgElement("path", { class: "pointer-link" });
+    element.append(
+      link,
+      svgElement("circle", { r: 7 }),
+      svgElement("path", { d: "M-12 0h4m16 0h4M0-12v4m0 16v4" }),
+    );
+    show(element, false);
+    interactionScene.append(element);
+    return { element, link };
+  });
   let width = 0;
   let height = 0;
   let ports: Port[] = [];
@@ -131,17 +178,23 @@ export function createSiteBackground(
     effects.append(element);
     return { x: 0, y: 0, vx: 0, vy: 0, age: Infinity, element };
   });
-  const trails: Effect[] = Array.from({ length: config.maxTrails }, (_, i) => {
+  const trails: Trail[] = Array.from({ length: config.maxTrails }, (_, i) => {
     const element = svgElement("g", {
       "data-trail": i,
       class: "background-trail",
     });
-    element.append(svgElement("circle", { r: 1 }));
+    element.append(
+      svgElement("circle", { r: 1 }),
+      svgElement("path", { class: "trail-light" }),
+      svgElement("path", { class: "trail-core" }),
+    );
     show(element, false);
     effects.append(element);
-    return { x: 0, y: 0, age: Infinity, element };
+    return { x: 0, y: 0, fromX: 0, fromY: 0, age: Infinity, element };
   });
   function clearEffects() {
+    show(pointerField, false);
+    for (const response of responders) show(response.element, false);
     for (const effect of [...waves, ...sparks, ...trails]) {
       effect.age = Infinity;
       show(effect.element, false);
@@ -175,6 +228,7 @@ export function createSiteBackground(
     width = bounds.width;
     height = bounds.height;
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    interactionSvg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     const columns =
       width < 800
         ? config.mobileColumns
@@ -273,6 +327,8 @@ export function createSiteBackground(
   }
   function render(dt: number) {
     const still = reduced.matches;
+    const pointerRadius = config.pointerRadius * (width < 800 ? 0.65 : 1);
+    const waveRadius = config.waveRadius * (width < 800 ? 0.6 : 1);
     activity +=
       ((elapsed - lastInput > config.idleAfter ? 0.35 : 1) - activity) *
       (1 - Math.exp(-dt * 2));
@@ -283,6 +339,10 @@ export function createSiteBackground(
     scene.setAttribute(
       "opacity",
       String(still ? 1 : smooth(clamp(elapsed / 1.2))),
+    );
+    interactionScene.setAttribute(
+      "opacity",
+      String(still ? 0 : smooth(clamp(elapsed / 0.7))),
     );
     for (let i = 0; i < ports.length; i++) {
       const port = ports[i];
@@ -297,19 +357,17 @@ export function createSiteBackground(
       const dx = port.bx - pointer.x;
       const dy = baseY - pointer.y;
       const distance = Math.hypot(dx, dy);
-      const force =
-        (1 - clamp(distance / config.pointerRadius)) ** 2 * pointerWeight;
+      const force = (1 - clamp(distance / pointerRadius)) ** 2 * pointerWeight;
       let impulseX = 0;
       let impulseY = 0;
       for (const wave of waves) {
         if (wave.age >= config.waveLife) continue;
-        const radius =
-          config.waveRadius * (1 - (1 - wave.age / config.waveLife) ** 3);
+        const radius = waveRadius * (1 - (1 - wave.age / config.waveLife) ** 3);
         const dist = Math.hypot(port.bx - wave.x, baseY - wave.y);
         const power =
           Math.exp(-(((dist - radius) / 32) ** 2)) *
           (1 - wave.age / config.waveLife) *
-          14;
+          config.waveImpulse;
         impulseX += ((port.bx - wave.x) / Math.max(dist, 1)) * power;
         impulseY += ((baseY - wave.y) / Math.max(dist, 1)) * power;
       }
@@ -338,6 +396,69 @@ export function createSiteBackground(
         "opacity",
         String(edgeFade(port.x, port.y) * (0.5 + port.depth * 0.3)),
       );
+    }
+    show(pointerField, !still && pointerWeight > 0.015);
+    if (!still && pointerWeight > 0.015) {
+      translate(pointerField, pointer.x, pointer.y);
+      pointerField.setAttribute(
+        "opacity",
+        String(pointerWeight * (0.6 + activity * 0.4)),
+      );
+      pointerField.children[0].setAttribute(
+        "r",
+        String(config.glowRadius * (width < 800 ? 0.65 : 1)),
+      );
+      pointerField.children[1].setAttribute(
+        "transform",
+        `rotate(${elapsed * 24})`,
+      );
+      pointerField.children[2].setAttribute(
+        "transform",
+        `rotate(${-elapsed * 38})`,
+      );
+    }
+    const responses = ports
+      .map((port, index) => {
+        const distance = Math.hypot(port.x - pointer.x, port.y - pointer.y);
+        let strength =
+          pointerWeight * (1 - clamp(distance / pointerRadius)) ** 1.4;
+        for (const wave of waves) {
+          if (wave.age >= config.waveLife) continue;
+          const radius =
+            waveRadius * (1 - (1 - wave.age / config.waveLife) ** 3);
+          const waveDistance = Math.hypot(port.x - wave.x, port.y - wave.y);
+          strength +=
+            Math.exp(-(((waveDistance - radius) / 48) ** 2)) *
+            (1 - wave.age / config.waveLife);
+        }
+        return {
+          port,
+          index,
+          strength: clamp(strength) * edgeFade(port.x, port.y),
+        };
+      })
+      .sort((a, b) => b.strength - a.strength);
+    for (let i = 0; i < responders.length; i++) {
+      const response = responders[i];
+      const source = responses[i];
+      const visible =
+        !still && source && source.strength > 0.015 && source.port.visible;
+      show(response.element, Boolean(visible));
+      if (!visible) continue;
+      const { port, strength } = source;
+      translate(response.element, port.x, port.y);
+      response.element.setAttribute("data-source", String(source.index));
+      response.element.setAttribute("opacity", String(strength * 0.65));
+      const dx = pointer.x - port.x;
+      const dy = pointer.y - port.y;
+      const length = Math.max(1, Math.hypot(dx, dy));
+      const endX = dx * Math.max(0, 1 - 24 / length);
+      const endY = dy * Math.max(0, 1 - 24 / length);
+      response.link.setAttribute(
+        "d",
+        `M0 0Q${(dx * 0.45).toFixed(2)} ${(dy * 0.15).toFixed(2)} ${endX.toFixed(2)} ${endY.toFixed(2)}`,
+      );
+      response.link.setAttribute("opacity", String(pointerWeight * 0.45));
     }
     for (const route of routes) {
       const visible =
@@ -373,7 +494,7 @@ export function createSiteBackground(
       show(wave.element, wave.age < config.waveLife);
       if (wave.age >= config.waveLife) continue;
       const life = clamp(wave.age / config.waveLife);
-      const radius = Math.max(1, config.waveRadius * (1 - (1 - life) ** 3));
+      const radius = Math.max(1, waveRadius * (1 - (1 - life) ** 3));
       translate(wave.element, wave.x, wave.y);
       wave.element.setAttribute("opacity", String((1 - life) ** 2));
       wave.element.children[0].setAttribute("r", String(radius));
@@ -401,10 +522,15 @@ export function createSiteBackground(
       if (trail.age >= config.trailLife) continue;
       const life = trail.age / config.trailLife;
       translate(trail.element, trail.x, trail.y);
-      trail.element.children[0].setAttribute("r", String(4 + life * 18));
+      trail.element.children[0].setAttribute("r", String(3 + life * 13));
+      const dx = trail.fromX - trail.x;
+      const dy = trail.fromY - trail.y;
+      const path = `M${dx.toFixed(2)} ${dy.toFixed(2)}Q${(dx * 0.4).toFixed(2)} ${(dy * 0.6).toFixed(2)} 0 0`;
+      trail.element.children[1].setAttribute("d", path);
+      trail.element.children[2].setAttribute("d", path);
       trail.element.setAttribute(
         "opacity",
-        String((1 - life) ** 2 * edgeFade(trail.x, trail.y) * 0.45),
+        String((1 - life) ** 2 * edgeFade(trail.x, trail.y) * 0.65),
       );
     }
   }
@@ -448,6 +574,7 @@ export function createSiteBackground(
     if (mode !== next) {
       mode = next;
       svg.dataset.motion = mode;
+      interactionSvg.dataset.motion = mode;
       onMode(mode);
     }
     if (frame) cancelAnimationFrame(frame);
@@ -458,6 +585,11 @@ export function createSiteBackground(
     if (mode === "running") frame = requestAnimationFrame(tick);
     else {
       leave();
+      if (mode === "paused") {
+        clearEffects();
+        pointerWeight = 0;
+        interactionScene.setAttribute("opacity", "0");
+      }
       if (mode === "reduced") {
         clearEffects();
         pointerWeight = 0;
@@ -475,12 +607,25 @@ export function createSiteBackground(
     if (down && Math.hypot(event.clientX - down.x, event.clientY - down.y) > 10)
       down = null;
     if (event.pointerType === "touch" || mode !== "running") return;
+    const fromX = pointer.inside ? pointer.x : event.clientX;
+    const fromY = pointer.inside ? pointer.y : event.clientY;
     pointer = { x: event.clientX, y: event.clientY, inside: true };
     lastInput = elapsed;
-    if (elapsed - lastTrail > 0.09 && !blocked(event)) {
+    if (elapsed - lastTrail > 0.045) {
       lastTrail = elapsed;
       const trail = trails[trailCursor++ % trails.length];
-      Object.assign(trail, { x: pointer.x, y: pointer.y, age: 0 });
+      const distance = Math.max(
+        1,
+        Math.hypot(fromX - pointer.x, fromY - pointer.y),
+      );
+      const scale = Math.min(1, 90 / distance);
+      Object.assign(trail, {
+        x: pointer.x,
+        y: pointer.y,
+        fromX: pointer.x + (fromX - pointer.x) * scale,
+        fromY: pointer.y + (fromY - pointer.y) * scale,
+        age: 0,
+      });
     }
   }
   function pointerDown(event: PointerEvent) {
@@ -523,7 +668,7 @@ export function createSiteBackground(
       variant,
     });
     wave.element.setAttribute("data-variant", String(variant));
-    const count = width < 800 ? 4 : 6;
+    const count = width < 800 ? 4 : 8;
     for (let i = 0; i < count; i++) {
       const spark = sparks[sparkCursor++ % sparks.length];
       const angle = (i / count) * Math.PI * 2 + variant * 0.4;
@@ -531,8 +676,8 @@ export function createSiteBackground(
         x: event.clientX,
         y: event.clientY,
         age: 0,
-        vx: Math.cos(angle) * 85,
-        vy: Math.sin(angle) * 85,
+        vx: Math.cos(angle) * config.sparkSpeed,
+        vy: Math.sin(angle) * config.sparkSpeed,
       });
     }
   }
@@ -582,6 +727,8 @@ export function createSiteBackground(
       window.removeEventListener("resize", resize);
       network.remove();
       effects.remove();
+      pointerField.remove();
+      for (const response of responders) response.element.remove();
     },
   };
 }

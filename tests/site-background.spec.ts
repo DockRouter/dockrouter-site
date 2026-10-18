@@ -3,11 +3,13 @@ import { expect, type Page, test } from "@playwright/test";
 
 const field = (page: Page) => page.locator(".site-background > svg");
 const picture = (page: Page) =>
-  field(page)
-    .locator(":scope > g")
-    .evaluate((el) => el.outerHTML);
+  page
+    .locator(".site-background > svg > g, .site-interaction-layer > svg > g")
+    .evaluateAll((nodes) => nodes.map((node) => node.outerHTML).join(""));
 const active = (page: Page, kind: string) =>
-  field(page).locator(`[data-${kind}]:not([style*="display: none"])`);
+  page
+    .locator(".site-interaction-layer")
+    .locator(`[data-${kind}]:not([style*="display: none"])`);
 async function setup(page: Page) {
   await page.clock.install({ time: new Date("2026-01-01T00:00:00Z") });
   await page.clock.pauseAt(new Date("2026-01-01T00:00:01Z"));
@@ -21,7 +23,10 @@ test("SVG field reacts locally, caps successive clicks, expires and excludes con
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await setup(page);
-  const total = await field(page).locator("*").count();
+  const graphics = page.locator(
+    ".site-background svg *, .site-interaction-layer svg *",
+  );
+  const total = await graphics.count();
   const positions = () =>
     field(page)
       .locator("[data-object]")
@@ -69,7 +74,7 @@ test("SVG field reacts locally, caps successive clicks, expires and excludes con
       variants.add(variant);
   }
   expect(variants.size).toBe(3);
-  expect(await field(page).locator("*").count()).toBe(total);
+  expect(await graphics.count()).toBe(total);
   await page.mouse.move(1, 1);
   await page.clock.runFor(2400);
   await expect(active(page, "wave")).toHaveCount(0);
@@ -254,6 +259,15 @@ for (const width of [375, 1920, 3840]) {
         width === 375 ? 12 : width === 3840 ? 65 : 35,
       );
       expect(await field(page).locator("*").count()).toBeLessThan(450);
+      expect(
+        await page
+          .locator(".site-background svg *, .site-interaction-layer svg *")
+          .count(),
+      ).toBeLessThan(650);
+      await expect(page.locator(".site-interaction-layer")).toHaveAttribute(
+        "aria-hidden",
+        "true",
+      );
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth),
       ).toBe(width);
