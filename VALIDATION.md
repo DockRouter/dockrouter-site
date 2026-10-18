@@ -38,3 +38,11 @@ The original rendered container measured 1536px at a 1920px viewport; the new la
 | 2560 | 1728 | 416 | 16px |
 
 All six sizes passed container/header/footer alignment, viewport containment, prose/table separation, page overflow and runtime-error checks across home, docs index, configuration reference, downloads, brand and changelog pages. Screenshots were reviewed for all target sizes, including mobile CTA wrapping and wide footer/grid composition. The existing 320px and 3840px controls also pass. Final local lint, build, typecheck and 26/26 browser tests passed. Screenshots and exact measurements are retained in ignored `.qa/layout/`.
+
+## Full-bleed hero network
+
+2026-10-18: added an independent Canvas 2D route network behind the entire hero, retaining the foreground SVG route explorer and shared 1728px content shell. No dependency changes. Central configuration controls density, colors, interaction radii, speed, lifetimes and resource limits.
+
+Final local lint, static build, typecheck and all **37/37** browser tests passed. Eleven new checks cover actual canvas redraws, local pointer trails, 24 successive taps (at most ten large ring strokes per frame), effect expiry, control exclusion, keyboard pause/resume, zero redraws while offscreen/hidden/unmounted, a static reduced-motion scene with live theme switching, runtime motion-preference changes, touch tap versus a native Chromium swipe, reduced idle frame count, and high-DPI 4K resize/raster bounds. The document-hidden case mocks the visibility API boundary; touch coverage uses Chromium emulation, not a physical phone.
+
+Light/dark screenshots at 375, 1920 and 3840px were visually reviewed; the existing six-size layout matrix and automated WCAG AA checks also passed. Screenshots are retained under `.qa/network/` and `.qa/layout/`. Canvas pixels are limited to approximately five million, DPR to 2 (1.5 on mobile), and transient objects to five waves, 32 sparks and nine pointer trails. Frame data stays outside React; observers, listeners and the RAF loop are disposed on navigation.

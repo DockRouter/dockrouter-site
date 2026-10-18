@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { HeroBackground } from "@/components/hero-background";
 import { Reveal } from "@/components/motion";
 import { RouterArt } from "@/components/router-art";
 import { Quickstart, RouteDemo } from "@/components/router-interactions";
@@ -73,52 +74,55 @@ const features = [
 export default function Home() {
   return (
     <main id="main">
-      <section className="dock-hero container">
-        <div className="dock-hero-copy">
-          <a
-            className="release-badge"
-            href={`${REPO}/releases/tag/v${VERSION}`}
-          >
-            <span className="status-light" />
-            <strong>v{VERSION}</strong>
-            <span>Small binary. Clear direction.</span>
-            <ArrowRight size={13} />
-          </a>
-          <div className="hero-kicker">THE DOCKER-NATIVE INGRESS ROUTER</div>
-          <h1>
-            Stop configuring.
-            <br />
-            <span>Start shipping.</span>
-          </h1>
-          <p className="dock-lead">
-            You build the application.
-            <br />
-            We’ll find the way in.
-          </p>
-          <p className="dock-description">
-            Automatic discovery. Effortless HTTPS. One Go binary that turns your
-            Docker labels into live routes.
-          </p>
-          <div className="hero-buttons">
-            <Link className="button primary" href="#quickstart">
-              Start routing <ArrowRight size={17} />
-            </Link>
-            <a className="button secondary" href={REPO}>
-              <Github size={17} />
-              Explore the source
-              <ArrowUpRight size={14} />
+      <section className="hero-scene" aria-label="DockRouter introduction">
+        <div className="dock-hero container">
+          <div className="dock-hero-copy">
+            <a
+              className="release-badge"
+              href={`${REPO}/releases/tag/v${VERSION}`}
+            >
+              <span className="status-light" />
+              <strong>v{VERSION}</strong>
+              <span>Small binary. Clear direction.</span>
+              <ArrowRight size={13} />
             </a>
+            <div className="hero-kicker">THE DOCKER-NATIVE INGRESS ROUTER</div>
+            <h1>
+              Stop configuring.
+              <br />
+              <span>Start shipping.</span>
+            </h1>
+            <p className="dock-lead">
+              You build the application.
+              <br />
+              We’ll find the way in.
+            </p>
+            <p className="dock-description">
+              Automatic discovery. Effortless HTTPS. One Go binary that turns
+              your Docker labels into live routes.
+            </p>
+            <div className="hero-buttons">
+              <Link className="button primary" href="#quickstart">
+                Start routing <ArrowRight size={17} />
+              </Link>
+              <a className="button secondary" href={REPO}>
+                <Github size={17} />
+                Explore the source
+                <ArrowUpRight size={14} />
+              </a>
+            </div>
+            <div className="hero-proof">
+              <span>
+                <i />
+                Pure Go
+              </span>
+              <span>Zero dependencies</span>
+              <span>MIT licensed</span>
+            </div>
           </div>
-          <div className="hero-proof">
-            <span>
-              <i />
-              Pure Go
-            </span>
-            <span>Zero dependencies</span>
-            <span>MIT licensed</span>
-          </div>
+          <RouterArt />
         </div>
-        <RouterArt />
+        <HeroBackground />
       </section>
       <div className="dock-principles container">
         <span>

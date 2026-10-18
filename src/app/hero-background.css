@@ -1,0 +1,109 @@
+.hero-scene {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+}
+.hero-network {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at 90% 25%,
+      light-dark(#0868db08, #0868db0d),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse at 10% 90%,
+      light-dark(#ff751005, #ff751008),
+      transparent 50%
+    );
+}
+.hero-network canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mask-image:
+    linear-gradient(transparent, #000 6%, #000 90%, transparent),
+    linear-gradient(
+      90deg,
+      transparent,
+      #000 32px,
+      #000 calc(100% - 32px),
+      transparent
+    );
+  mask-composite: intersect;
+}
+.hero-scene .dock-hero {
+  padding-block: clamp(56px, 5vw, 88px) clamp(40px, 4vw, 72px);
+}
+.hero-scene-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: clamp(20px, 2vw, 32px);
+  color: var(--muted);
+  font: 400 0.65rem var(--mono);
+}
+.hero-scene-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.hero-scene-hint i {
+  display: block;
+  width: 5px;
+  height: 5px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--brand-orange);
+}
+.hero-scene-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 32px;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--paper);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.hero-scene-toggle:hover:not(:disabled) {
+  border-color: var(--accent-ink);
+  color: var(--accent-ink);
+}
+.hero-scene-toggle:disabled {
+  cursor: default;
+}
+@media (max-width: 1024px) {
+  .hero-scene-hint > span {
+    display: none;
+  }
+}
+@media (max-width: 500px) {
+  .hero-scene .dock-hero {
+    padding-top: 40px;
+  }
+  .hero-scene-controls {
+    font-size: 0.55rem;
+    gap: 0.75rem;
+  }
+  .hero-scene-hint {
+    max-width: 20ch;
+    line-height: 1.6;
+    gap: 0.5rem;
+  }
+  .hero-scene-toggle {
+    min-height: 40px;
+  }
+}
+@media (hover: none) {
+  .hero-scene-hint > span {
+    display: none;
+  }
+}

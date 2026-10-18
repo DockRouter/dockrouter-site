@@ -42,6 +42,10 @@ MIT licensed. Third-party marks retain their ownership.
 
 The hero uses the owner-supplied anchor upright at the center of an interactive SVG routing scene. Four synchronized stages show receive, TLS termination, route matching and forwarding. Destination buttons select the web/API/realtime example; pause and replay controls are keyboard accessible. Animation timers stop outside the viewport or in a hidden document. Reduced-motion mode shows a completed route while preserving destination selection. All displayed traffic is illustrative.
 
+The full-bleed Canvas 2D background is independent of the SVG illustration. `HeroBackground` mounts the network renderer in `src/lib/hero-network.ts`; `HERO_NETWORK` centralizes density, speed, radii, lifetimes, effect limits and theme palettes. Branching routes carry request packets, local pointer movement displaces nearby ports, and empty-space taps emit bounded, short-lived waves. Controls and copy are excluded from tap effects; touch scrolling uses passive events. The scene has its own keyboard-accessible pause control, a static reduced-motion view, a 30fps idle budget, and a capped raster (2× DPR, 1.5× on mobile, at most five million pixels). Visibility/intersection observers suspend the frame loop; unmount removes all listeners and observers. No graphics dependency was added.
+
+`tests/hero-network.spec.ts` exercises drawing changes, pointer trails, 24 repeated taps, expiry, control exclusion, pause, offscreen suspension, the document visibility API boundary, navigation cleanup, dynamic reduced motion, theme changes, touch swipes, idle pacing and high-DPI resizing. Mobile/desktop/4K screenshots in both themes are saved under `.qa/network/`.
+
 ## Shared layout system
 
 `src/app/layout-system.css` owns the site container and spacing tokens. The shell uses fluid gutters and a 1728px maximum while retaining the browser's default root font size. Header, content and footer share the same alignment. Prose is capped at 65ch; code, tables and visual panels can use the remaining width. Wide hero steps become a side rail, documentation and brand cards use three columns, and release cards use two columns.
