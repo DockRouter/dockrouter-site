@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { HeroBackground } from "@/components/hero-background";
 import { Reveal } from "@/components/motion";
 import { RouterArt } from "@/components/router-art";
 import { Quickstart, RouteDemo } from "@/components/router-interactions";
@@ -122,7 +121,6 @@ export default function Home() {
           </div>
           <RouterArt />
         </div>
-        <HeroBackground />
       </section>
       <div className="dock-principles container">
         <span>

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Footer } from "@/components/footer";
 import { Navigation } from "@/components/navigation";
+import { SiteBackground } from "@/components/site-background";
 import { description, SITE } from "@/lib/site";
 import "@fontsource-variable/geist";
 import "@fontsource-variable/geist-mono";
@@ -9,7 +10,7 @@ import "./appearance.css";
 import "./dockrouter.css";
 import "./hero.css";
 import "./layout-system.css";
-import "./hero-background.css";
+import "./site-background.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
@@ -63,6 +64,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
+        <SiteBackground />
         <a className="skip-link" href="#main">
           Skip to content
         </a>

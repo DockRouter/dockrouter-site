@@ -71,14 +71,13 @@ for (const width of viewports) {
       }
       if (path === "/") {
         if (width === 375) {
-          const buttons = await page
+          // Read both in one frame: their shared entrance transform is moving.
+          const buttonRows = await page
             .locator(".dock-hero .hero-buttons .button")
-            .all();
-          const firstButton = await buttons[0].boundingBox();
-          const secondButton = await buttons[1].boundingBox();
-          expect(
-            Math.abs((firstButton?.y ?? 0) - (secondButton?.y ?? 0)),
-          ).toBeLessThan(1.5);
+            .evaluateAll((buttons) =>
+              buttons.map((button) => button.getBoundingClientRect().y),
+            );
+          expect(Math.abs(buttonRows[0] - buttonRows[1])).toBeLessThan(1.5);
         }
         await writeFile(
           `.qa/layout/metrics-${width}.json`,
