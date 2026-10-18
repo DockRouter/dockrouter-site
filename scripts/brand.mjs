@@ -2,6 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { openSync } from "fontkit";
 import sharp from "sharp";
 import { routerSymbolSvg } from "../src/lib/brand-geometry.ts";
+import { generateOg } from "./og.mjs";
 
 const font = openSync(
   "node_modules/@fontsource/geist/files/geist-latin-700-normal.woff",
@@ -68,8 +69,7 @@ await sharp(Buffer.from(favicon))
   .resize(180)
   .png()
   .toFile("public/apple-touch-icon.png");
-const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630"><rect width="1200" height="630" fill="#f7f9fd"/><path d="M0 580h1200" stroke="#dce4ef"/><g transform="translate(860 160) scale(.55)">${routerSymbolSvg("social")}</g><g transform="translate(72 48) scale(.5)">${glyphs("#153454")}</g><text x="72" y="270" fill="#153454" font-family="Arial,sans-serif" font-size="78" font-weight="600" letter-spacing="-4">Stop configuring.</text><text x="72" y="360" fill="#0868db" font-family="Arial,sans-serif" font-size="78" font-weight="600" letter-spacing="-4">Start shipping.</text><text x="76" y="435" fill="#596b82" font-family="Arial,sans-serif" font-size="24">Docker-native ingress. Automatic TLS. Pure Go.</text><text x="76" y="540" fill="#596b82" font-family="monospace" font-size="16">ZERO DEPENDENCIES / MIT LICENSED / DOCKROUTER.COM</text></svg>`;
-await sharp(Buffer.from(og)).png().toFile("public/og.png");
+await generateOg();
 await sharp(Buffer.from(svg("0 0 512 512", routerSymbolSvg("preview"))))
   .resize(640)
   .flatten({ background: "#fff" })

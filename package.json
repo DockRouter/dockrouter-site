@@ -7,6 +7,7 @@
     "dev": "next dev --hostname 127.0.0.1",
     "build": "next build && node scripts/normalize-export.mjs",
     "brand": "node scripts/brand.mjs && biome format --write src/lib/wordmark.ts",
+    "og": "node scripts/og.mjs",
     "preview": "node scripts/preview.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "biome check src tests scripts next.config.ts playwright.config.ts",
