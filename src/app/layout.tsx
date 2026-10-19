@@ -5,12 +5,15 @@ import { SiteBackground } from "@/components/site-background";
 import { description, SITE } from "@/lib/site";
 import "@fontsource-variable/geist";
 import "@fontsource-variable/geist-mono";
+import "@fontsource-variable/manrope";
+import "@fontsource-variable/space-grotesk";
 import "./globals.css";
 import "./appearance.css";
 import "./dockrouter.css";
 import "./hero.css";
 import "./layout-system.css";
 import "./site-background.css";
+import "./oxog-footer.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),

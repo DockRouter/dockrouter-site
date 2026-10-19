@@ -105,9 +105,9 @@ for (const width of viewports) {
       await page.screenshot({ path: `.qa/layout/${name}-${width}.png` });
       if (path === "/") {
         await page.locator(".site-footer").scrollIntoViewIfNeeded();
-        await expect(page.locator(".studio-symbol path").last()).toHaveCSS(
-          "stroke-dashoffset",
-          "0px",
+        await expect(page.locator(".oxog-mark")).toHaveAttribute(
+          "data-visible",
+          "true",
         );
         await page.screenshot({ path: `.qa/layout/footer-${width}.png` });
       }

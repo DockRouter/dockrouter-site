@@ -861,15 +861,6 @@ h2 {
 .footer-brand .logo {
   width: auto;
 }
-.studio-card {
-  border-radius: 8px;
-}
-.studio-logo-link:hover .studio-symbol {
-  transform: rotate(-5deg);
-}
-.studio-symbol {
-  transition: transform 0.4s;
-}
 .theme-preview-content i:first-child {
   background: #ff7510;
 }
@@ -1370,8 +1361,5 @@ p > a:not(.button) {
   .discovery-visual > div,
   .request-journey > i:after {
     animation: none;
-  }
-  .studio-symbol {
-    transition: none;
   }
 }

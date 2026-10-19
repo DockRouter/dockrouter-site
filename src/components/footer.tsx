@@ -46,59 +46,21 @@ export function Footer() {
           <a href={`${REPO}/blob/main/LICENSE`}>MIT license</a>
         </div>
       </div>
-      <section
-        className="studio-section container"
-        aria-labelledby="studio-heading"
-      >
-        <div className="studio-card">
-          <a
-            className="studio-logo-link"
-            href="https://oxog.net/"
-            aria-label="Visit OXOGNET"
-          >
-            <OxogMark />
-          </a>
-          <div className="studio-copy">
-            <span className="eyebrow">THE PEOPLE BEHIND THE CONNECTION</span>
-            <p>DockRouter is part of the</p>
+      <div className="container oxog-studio-section">
+        <a className="oxog-studio" href="https://oxog.net">
+          <OxogMark />
+          <div>
+            <span className="eyebrow">PART OF A BIGGER PICTURE</span>
             <h2 id="studio-heading">
-              <a href="https://oxog.net/">
-                oxog<span>net</span>
-                <span className="studio-dot">.</span>
-                <ArrowUpRight size={22} />
-              </a>
+              Small studio. <span>Big ideas.</span>
             </h2>
-            <p>
-              An independent studio in Estonia building AI agents, developer
-              tools and the infrastructure behind them. A shared curiosity. A
-              whole ecosystem of ideas.
-            </p>
-            <a className="studio-explore" href="https://oxog.net/projects">
-              Explore the OXOGNET ecosystem <ArrowUpRight size={14} />
-            </a>
+            <p>Explore the tools and infrastructure from Oxog.</p>
           </div>
-          <nav className="studio-projects" aria-label="More from OXOGNET">
-            {[
-              ["AGEZT", "An agentic operating system", "agezt"],
-              ["WrongStack", "AI coding orchestration", "wrongstack"],
-              ["WrongTrace", "Agent observability", "wrongtrace"],
-              ["NineDeploy", "Self-hosted deployment", "ninedeploy"],
-            ].map(([name, description, slug]) => (
-              <a key={slug} href={`https://oxog.net/projects/${slug}`}>
-                <span>
-                  <strong>{name}</strong>
-                  <small>{description}</small>
-                </span>
-                <ArrowUpRight size={14} />
-              </a>
-            ))}
-          </nav>
-        </div>
-        <div className="studio-signature">
-          <span>OXOGNET OÜ</span>
-          <span>Made in Estonia. Built for the world.</span>
-        </div>
-      </section>
+          <span className="oxog-studio-link">
+            Meet oxog.net <ArrowUpRight size={18} />
+          </span>
+        </a>
+      </div>
       <div className="container footer-bottom">
         <span>© {new Date().getUTCFullYear()} DockRouter contributors</span>
         <span className="footer-bottom-links">

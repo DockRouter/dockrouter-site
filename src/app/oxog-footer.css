@@ -1,0 +1,149 @@
+/* OXOG signature: the Mammoth Engine card, scoped to its own brand and type. */
+.oxog-studio-section {
+  padding-bottom: 28px;
+}
+.oxog-studio {
+  --oxog-text: light-dark(#191c32, #f6f0e4);
+  --oxog-muted: light-dark(#65605a, #b5b2b9);
+  --oxog-line: light-dark(#ded4c2, #373b50);
+  --oxog-accent: light-dark(#333957, #e7d2a4);
+  --oxog-purple: light-dark(#692d91, #b477e4);
+  display: flex;
+  align-items: center;
+  gap: clamp(30px, 4vw, 70px);
+  padding: 35px 45px;
+  border: 1px solid var(--oxog-line);
+  border-radius: 7px;
+  background: radial-gradient(ellipse at 15% 30%, #ed08780a, transparent 65%);
+  background-color: light-dark(#faf6ee, #111426);
+  color: var(--oxog-text);
+  font:
+    400 15px / 1.7 "Manrope Variable",
+    sans-serif;
+  text-decoration: none;
+}
+.oxog-mark {
+  display: block;
+  flex-shrink: 0;
+  width: 105px;
+  height: auto;
+}
+.oxog-studio .eyebrow {
+  display: block;
+  margin: 0 0 9px;
+  color: var(--oxog-accent);
+  font:
+    8px / 1.6 "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+  letter-spacing: 0.12em;
+}
+.oxog-studio .eyebrow::before {
+  display: none;
+}
+.oxog-studio h2 {
+  margin: 0;
+  font:
+    500 35px / 1.12 "Space Grotesk Variable",
+    sans-serif;
+  letter-spacing: -0.045em;
+}
+.oxog-studio h2 > span {
+  color: var(--oxog-muted);
+}
+.oxog-studio p {
+  margin: 9px 0 0;
+  color: var(--oxog-muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.oxog-studio-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  white-space: nowrap;
+  color: var(--oxog-accent);
+  font-size: 12px;
+}
+.oxog-studio-link > svg {
+  flex-shrink: 0;
+}
+.oxog-studio:hover {
+  border-color: #ed0878;
+}
+.oxog-studio:focus-visible {
+  outline: 2px solid #ed0878;
+  outline-offset: 5px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .oxog-mark[data-visible="true"] path {
+    stroke-dasharray: 400;
+    animation: oxog-draw 6s ease-in-out var(--draw-delay, 0s) infinite;
+  }
+  .oxog-mark path:nth-child(2) {
+    --draw-delay: 0.15s;
+  }
+  .oxog-mark path:nth-child(3) {
+    --draw-delay: 0.3s;
+  }
+  .oxog-mark path:nth-child(4) {
+    --draw-delay: 0.45s;
+  }
+}
+@keyframes oxog-draw {
+  0% {
+    stroke-dashoffset: 400;
+  }
+  33%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+@media (max-width: 1100px) {
+  .oxog-studio {
+    padding: 30px;
+    gap: 30px;
+  }
+  .oxog-studio h2 {
+    font-size: 29px;
+  }
+}
+@media (max-width: 800px) {
+  .oxog-studio {
+    flex-wrap: wrap;
+  }
+  .oxog-studio-link {
+    width: 100%;
+    margin: 0;
+    justify-content: end;
+  }
+}
+@media (max-width: 520px) {
+  .oxog-studio {
+    padding: 25px;
+    gap: 22px;
+  }
+  .oxog-studio .oxog-mark {
+    width: 65px;
+  }
+  .oxog-studio > div {
+    flex: 1;
+  }
+  .oxog-studio .eyebrow {
+    font-size: 6px;
+  }
+  .oxog-studio h2 {
+    font-size: 25px;
+  }
+  .oxog-studio h2 > span {
+    display: block;
+  }
+  .oxog-studio p {
+    font-size: 9px;
+  }
+  .oxog-studio-link {
+    font-size: 10px;
+  }
+}

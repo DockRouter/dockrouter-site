@@ -286,30 +286,14 @@ test("reduced motion keeps diagrams, content and studio mark visible", async ({
     "animation-name",
     "none",
   );
-  await page.locator(".studio-symbol").scrollIntoViewIfNeeded();
-  await expect(page.locator(".studio-symbol path").first()).toHaveCSS(
+  await page.locator(".oxog-mark").scrollIntoViewIfNeeded();
+  await expect(page.locator(".oxog-mark path").first()).toHaveCSS(
     "stroke-dashoffset",
     "0px",
   );
   await expect(
     page.getByRole("heading", { name: /A route you can follow/ }),
   ).toBeVisible();
-});
-test("OXOGNET signature draws on entering the viewport", async ({ page }) => {
-  await page.goto("/");
-  await page.locator(".studio-symbol").scrollIntoViewIfNeeded();
-  await expect(page.locator(".studio-symbol")).toHaveAttribute(
-    "data-motion",
-    "drawing",
-  );
-  await expect(page.locator(".studio-symbol path").last()).toHaveCSS(
-    "stroke-dashoffset",
-    "0px",
-  );
-  await expect(
-    page.getByRole("link", { name: "Visit OXOGNET" }),
-  ).toHaveAttribute("href", "https://oxog.net/");
-  await page.screenshot({ path: ".qa/studio.png" });
 });
 test("documentation, downloads, brand and release pages meet automated WCAG AA checks", async ({
   page,

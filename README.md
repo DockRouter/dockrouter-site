@@ -33,8 +33,8 @@ Push to main. `.github/workflows/deploy.yml` runs lint, static export, typecheck
 - Product information is based on the upstream [README](https://github.com/DockRouter/dockrouter), its Go module (Go 1.22), and v1.2.0 release assets, checked on 2026-10-18. Update `src/lib/site.ts` and verify the release matrix when changing versions.
 - Nine documentation topics cover installation, routing, TLS, balancing, security, observability, architecture and configuration. The route explorer is a labeled local simulation. It does not contact a Docker host or run an ingress router.
 - DockRouter SVG mark redrawn from the owner-supplied anchor and routing reference, outlined wordmark, favicon, stacked variants and social image live in `public/`. `npm run brand` regenerates them with Fontkit and Sharp. The outlined wordmark uses OFL-licensed Geist and needs no installed font when downloaded.
-- The website foundation was adapted from the MIT-licensed WireRift website. The appearance picker and animated OXOGNET area were adapted from the MIT-licensed CobaltDB website as requested. Copyright notices are retained in `public/licenses/`.
-- Geist and Geist Mono are bundled locally. Lucide provides interface icons. Third-party license notices are included in `public/licenses/`.
+- The website foundation was adapted from the MIT-licensed WireRift website. The appearance picker and OXOG SVG originated in the MIT-licensed CobaltDB website. The footer now matches Mammoth Engine's OXOG card: its four SVG paths, six-second staggered drawing loop, copy, typography, colors and responsive spacing. The previous ecosystem project grid and extra studio signature were removed. Copyright notices are retained in `public/licenses/`.
+- Geist and Geist Mono are bundled locally; the OXOG card uses locally bundled Manrope and Space Grotesk to match its reference. Lucide provides interface icons. Third-party license notices are included in `public/licenses/`.
 
 MIT licensed. Third-party marks retain their ownership.
 

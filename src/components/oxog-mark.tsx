@@ -6,25 +6,21 @@ export function OxogMark() {
   const ref = useRef<SVGSVGElement>(null);
   useEffect(() => {
     const symbol = ref.current;
-    if (
-      !symbol ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-      !("IntersectionObserver" in window)
-    )
-      return;
-    symbol.dataset.motion = "waiting";
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        symbol.dataset.motion = "drawing";
-        observer.disconnect();
-      },
-      { rootMargin: "0px 0px -80px 0px" },
-    );
+    if (!symbol || !("IntersectionObserver" in window)) return;
+    let visible = false;
+    const sync = () => {
+      symbol.dataset.visible = String(visible && !document.hidden);
+    };
+    const observer = new IntersectionObserver((entries) => {
+      visible = entries.some((entry) => entry.isIntersecting);
+      sync();
+    });
     observer.observe(symbol);
+    document.addEventListener("visibilitychange", sync);
     return () => {
       observer.disconnect();
-      delete symbol.dataset.motion;
+      document.removeEventListener("visibilitychange", sync);
+      delete symbol.dataset.visible;
     };
   }, []);
   return (
@@ -33,16 +29,17 @@ export function OxogMark() {
       viewBox="0 0 200 130"
       fill="none"
       aria-hidden="true"
-      className="studio-symbol"
+      className="oxog-mark"
+      data-visible="false"
     >
       <path
         d="M93 56 72 35C49 13 14 24 9 53 3 84 23 104 46 103"
-        stroke="var(--oxog-pink)"
+        stroke="#ed0878"
         strokeWidth="12"
       />
       <path
         d="M146 25c24-7 45 10 47 34 3 26-16 46-39 44-14-1-24-11-41-27"
-        stroke="var(--oxog-pink)"
+        stroke="#ed0878"
         strokeWidth="12"
       />
       <path
@@ -53,7 +50,7 @@ export function OxogMark() {
       />
       <path
         d="m74 87 54-51"
-        stroke="var(--oxog-pink)"
+        stroke="#ed0878"
         strokeWidth="12"
         strokeLinecap="square"
       />
