@@ -22,6 +22,97 @@ const templates = [
 ];
 const phase = process.env.DESIGN_AUDIT_PHASE || "after";
 
+test("200 percent zoom equivalent reflow preserves controls and keyboard table scrolling", async ({
+  browser,
+  baseURL,
+}) => {
+  // A 1280x900 screen at 200% zoom exposes a 640x450 CSS viewport at DPR 2.
+  const context = await browser.newContext({
+    baseURL,
+    viewport: { width: 640, height: 450 },
+    deviceScaleFactor: 2,
+  });
+  try {
+    const page = await context.newPage();
+    await page.goto("/download/");
+    await page.getByLabel("Processor architecture").selectOption("arm64");
+    await expect(
+      page.getByRole("link", { name: /Download DockRouter/ }),
+    ).toHaveAttribute("href", /linux_arm64\.tar\.gz$/);
+    await page
+      .getByRole("button", { name: "Search documentation", exact: true })
+      .click();
+    await expect(
+      page.getByRole("button", { name: "Close search" }),
+    ).toBeInViewport({ ratio: 1 });
+    await page.getByRole("dialog").press("Escape");
+    await expect(
+      page.getByRole("button", { name: "Search documentation", exact: true }),
+    ).toBeFocused();
+    await page.goto("/docs/configuration/");
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    // The table fits at 640px; at the narrow reflow limit it must scroll by key.
+    await page.setViewportSize({ width: 320, height: 450 });
+    const table = page.getByRole("region", {
+      name: "Global environment table",
+      exact: true,
+    });
+    await table.focus();
+    expect(await table.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(
+      true,
+    );
+    await table.press("ArrowRight");
+    await expect
+      .poll(() => table.evaluate((el) => el.scrollLeft))
+      .toBeGreaterThan(0);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.setViewportSize({ width: 640, height: 450 });
+    await mkdir(".qa/design/after", { recursive: true });
+    await page.screenshot({ path: ".qa/design/after/zoom-200-equivalent.png" });
+  } finally {
+    await context.close();
+  }
+});
+
+test("static content and documentation links remain available without JavaScript", async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({
+    baseURL,
+    javaScriptEnabled: false,
+    viewport: { width: 375, height: 812 },
+  });
+  try {
+    const page = await context.newPage();
+    await page.goto("/");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      /Stop configuring\.\s*Start shipping\./,
+    );
+    await expect(
+      page.getByRole("heading", { name: /A route you can follow/ }),
+    ).toBeVisible();
+    await page
+      .locator("footer")
+      .getByRole("link", { name: "Documentation", exact: true })
+      .click();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "Meet DockRouter",
+    );
+    await expect(page.locator("pre").first()).toContainText("dockrouter:");
+  } finally {
+    await context.close();
+  }
+});
+
 test("local fonts render UI, code and Turkish characters without fallback glyphs", async ({
   page,
   context,

@@ -95,6 +95,10 @@ samp {
 .code-block :focus-visible {
   outline-color: #79b6ff;
 }
+.code-block pre:focus-visible {
+  outline-offset: -3px;
+  border-radius: 0;
+}
 .copy-status {
   top: calc(100% + 0.25rem);
   right: 0;
