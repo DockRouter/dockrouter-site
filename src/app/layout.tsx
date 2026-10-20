@@ -2,11 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Footer } from "@/components/footer";
 import { Navigation } from "@/components/navigation";
 import { SiteBackground } from "@/components/site-background";
+import { jetbrainsMono, spaceGrotesk } from "@/lib/fonts";
 import { description, SITE } from "@/lib/site";
-import "@fontsource-variable/geist";
-import "@fontsource-variable/geist-mono";
-import "@fontsource-variable/manrope";
-import "@fontsource-variable/space-grotesk";
 import "./globals.css";
 import "./appearance.css";
 import "./dockrouter.css";
@@ -14,6 +11,7 @@ import "./hero.css";
 import "./layout-system.css";
 import "./site-background.css";
 import "./oxog-footer.css";
+import "./design-system.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
@@ -61,7 +59,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Fixed local theme bootstrap; contains no external input. */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

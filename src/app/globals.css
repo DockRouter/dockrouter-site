@@ -10,7 +10,9 @@
   --amber: #f5b32c;
   --accent-ink: light-dark(#88600b, #f5bd52);
   --logo-cut: var(--paper);
-  --mono: "Geist Mono Variable", monospace;
+  --font-sans: var(--font-space-grotesk), sans-serif;
+  --font-quicksand: "Quicksand", "Quicksand Fallback", sans-serif;
+  --mono: var(--font-jetbrains), monospace;
   --oxog-pink: #ed0878;
   --oxog-purple: light-dark(#692d91, #b477e4);
 }
@@ -31,7 +33,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: "Geist Variable", sans-serif;
+  font-family: var(--font-sans);
   font-size: 1rem;
   -webkit-font-smoothing: antialiased;
 }
@@ -1622,9 +1624,7 @@ h1 > span {
   height: 4px;
 }
 .footer-column h3 {
-  font:
-    500 0.67rem "Geist Variable",
-    sans-serif;
+  font: 500 0.67rem var(--font-sans);
   letter-spacing: 0;
   margin: 0.5rem 0 1.3rem;
 }

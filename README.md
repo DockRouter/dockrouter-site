@@ -34,7 +34,7 @@ Push to main. `.github/workflows/deploy.yml` runs lint, static export, typecheck
 - Nine documentation topics cover installation, routing, TLS, balancing, security, observability, architecture and configuration. The route explorer is a labeled local simulation. It does not contact a Docker host or run an ingress router.
 - DockRouter SVG mark redrawn from the owner-supplied anchor and routing reference, outlined wordmark, favicon, stacked variants and social image live in `public/`. `npm run brand` regenerates them with Fontkit and Sharp. The outlined wordmark uses OFL-licensed Geist and needs no installed font when downloaded.
 - The website foundation was adapted from the MIT-licensed WireRift website. The appearance picker and OXOG SVG originated in the MIT-licensed CobaltDB website. The footer now matches Mammoth Engine's OXOG card: its four SVG paths, six-second staggered drawing loop, copy, typography, colors and responsive spacing. The previous ecosystem project grid and extra studio signature were removed. Copyright notices are retained in `public/licenses/`.
-- Geist and Geist Mono are bundled locally; the OXOG card uses locally bundled Manrope and Space Grotesk to match its reference. Lucide provides interface icons. Third-party license notices are included in `public/licenses/`.
+- Space Grotesk and JetBrains Mono are bundled variable WOFF2 fonts, loaded with `next/font/local` through centralized UI/monospace tokens. Font provenance and Turkish glyph coverage are documented in `src/fonts/README.md`. The outlined brand lettering remains independent. Lucide provides interface icons. Third-party license notices are included in `public/licenses/`.
 
 MIT licensed. Third-party marks retain their ownership.
 

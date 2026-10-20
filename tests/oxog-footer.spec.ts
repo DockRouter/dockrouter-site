@@ -116,7 +116,9 @@ for (const width of [375, 1440]) {
       );
       await expect(card.locator("h2")).toHaveCSS(
         "font-family",
-        '"Space Grotesk Variable", sans-serif',
+        await page
+          .locator("body")
+          .evaluate((el) => getComputedStyle(el).fontFamily),
       );
       await expect(card).toHaveCSS(
         "background-color",

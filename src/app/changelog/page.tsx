@@ -36,15 +36,17 @@ export default function Changelog() {
             Native binary archives are available for Linux, macOS and Windows,
             on amd64 and arm64 architectures.
           </p>
-          <a
-            href={`${REPO}/releases/tag/v${VERSION}`}
-            className="button primary"
-          >
-            Read the release notes <ArrowUpRight size={16} />
-          </a>
-          <Link href="/download/" className="button secondary">
-            Get the binary <ArrowRight size={16} />
-          </Link>
+          <div className="action-row">
+            <a
+              href={`${REPO}/releases/tag/v${VERSION}`}
+              className="button primary"
+            >
+              Read the release notes <ArrowUpRight size={16} />
+            </a>
+            <Link href="/download/" className="button secondary">
+              Get the binary <ArrowRight size={16} />
+            </Link>
+          </div>
         </article>
         <article className="release-card">
           <h2>Every change has a trail.</h2>

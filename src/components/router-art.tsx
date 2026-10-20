@@ -12,8 +12,8 @@ import {
   Radio,
   RotateCcw,
 } from "lucide-react";
-import { useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { RouterGlyph } from "./logo";
 
 const destinations = [

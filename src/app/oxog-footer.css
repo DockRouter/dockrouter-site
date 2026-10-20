@@ -17,9 +17,7 @@
   background: radial-gradient(ellipse at 15% 30%, #ed08780a, transparent 65%);
   background-color: light-dark(#faf6ee, #111426);
   color: var(--oxog-text);
-  font:
-    400 15px / 1.7 "Manrope Variable",
-    sans-serif;
+  font: 400 15px / 1.7 var(--font-sans);
   text-decoration: none;
 }
 .oxog-mark {
@@ -44,9 +42,7 @@
 }
 .oxog-studio h2 {
   margin: 0;
-  font:
-    500 35px / 1.12 "Space Grotesk Variable",
-    sans-serif;
+  font: 500 35px / 1.12 var(--font-sans);
   letter-spacing: -0.045em;
 }
 .oxog-studio h2 > span {

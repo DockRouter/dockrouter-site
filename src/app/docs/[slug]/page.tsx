@@ -97,7 +97,7 @@ export default async function DocPage({
                 role="region"
                 // biome-ignore lint/a11y/noNoninteractiveTabindex: Allow keyboard scrolling of the endpoint table.
                 tabIndex={0}
-                aria-label="API endpoints"
+                aria-label={`${section.title} table`}
               >
                 <table className="doc-table">
                   <thead>

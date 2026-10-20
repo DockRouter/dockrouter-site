@@ -24,6 +24,8 @@ export function Navigation() {
   const dialog = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const searchTrigger = useRef<HTMLButtonElement>(null);
+  const menuTrigger = useRef<HTMLButtonElement>(null);
+  const header = useRef<HTMLElement>(null);
   const results = docs.filter((d) =>
     `${d.title} ${d.description} ${d.sections.map((s) => `${s.title} ${s.text}`).join(" ")}`
       .toLowerCase()
@@ -49,11 +51,43 @@ export function Navigation() {
           input.current?.focus();
         }
       }
-      if (e.key === "Escape") setMenu(false);
+      if (e.key === "Escape" && menu) {
+        setMenu(false);
+        menuTrigger.current?.focus();
+      }
     }
     document.addEventListener("keydown", key);
     return () => document.removeEventListener("keydown", key);
-  }, []);
+  }, [menu]);
+  useEffect(() => {
+    if (!menu) return;
+    const wide = window.matchMedia("(min-width: 981px)");
+    const resize = () => {
+      if (wide.matches) setMenu(false);
+    };
+    const dismiss = (event: MouseEvent) => {
+      if (
+        event.target instanceof Node &&
+        (!header.current?.contains(event.target) ||
+          (event.target instanceof Element &&
+            event.target.closest(".header-actions") &&
+            !menuTrigger.current?.contains(event.target)))
+      )
+        setMenu(false);
+    };
+    wide.addEventListener("change", resize);
+    document.addEventListener("click", dismiss);
+    return () => {
+      wide.removeEventListener("change", resize);
+      document.removeEventListener("click", dismiss);
+    };
+  }, [menu]);
+  function current(href: string) {
+    if (pathname === href) return "page" as const;
+    if (href.startsWith("/docs/") && pathname.startsWith("/docs/"))
+      return "location" as const;
+    return undefined;
+  }
   const links = [
     ["Why DockRouter", "/#features"],
     ["Documentation", "/docs/getting-started/"],
@@ -62,7 +96,7 @@ export function Navigation() {
   ];
   return (
     <>
-      <header className="site-header">
+      <header className="site-header" ref={header}>
         <div className="header-inner container">
           <Link
             href="/"
@@ -73,11 +107,7 @@ export function Navigation() {
           </Link>
           <nav className="desktop-nav" aria-label="Main navigation">
             {links.map(([label, href]) => (
-              <Link
-                key={href}
-                href={href}
-                aria-current={pathname === href ? "page" : undefined}
-              >
+              <Link key={href} href={href} aria-current={current(href)}>
                 {label}
               </Link>
             ))}
@@ -107,6 +137,7 @@ export function Navigation() {
             <button
               type="button"
               className="menu-trigger"
+              ref={menuTrigger}
               aria-expanded={menu}
               aria-controls="mobile-menu"
               aria-label={menu ? "Close menu" : "Open menu"}
@@ -123,7 +154,12 @@ export function Navigation() {
             aria-label="Mobile navigation"
           >
             {links.map(([label, href]) => (
-              <Link key={href} href={href} onClick={() => setMenu(false)}>
+              <Link
+                key={href}
+                href={href}
+                aria-current={current(href)}
+                onClick={() => setMenu(false)}
+              >
                 {label}
                 <ArrowRight size={16} />
               </Link>

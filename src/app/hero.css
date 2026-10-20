@@ -410,9 +410,7 @@
   display: flex;
   align-items: center;
   padding: 0.75rem 1.5rem;
-  font:
-    400 0.49rem / 1.5 "Geist Variable",
-    sans-serif;
+  font: 400 0.49rem / 1.5 var(--font-sans);
   color: var(--muted);
 }
 .hero-routing figcaption button {
